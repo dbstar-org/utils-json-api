@@ -1,69 +1,151 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.yeecloud.commons.utils</groupId>
-    <artifactId>UTILS</artifactId>
-    <version>1.0.0</version>
+    <groupId>io.github.dbstarll.parent</groupId>
+    <artifactId>base</artifactId>
+    <version>1.1.9</version>
   </parent>
+  <groupId>io.github.dbstarll</groupId>
   <artifactId>utils-json</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>utils-json</name>
+  <description>utils for json</description>
+  <url>https://github.com/dbstarll/utils-json</url>
+
+  <scm>
+    <connection>scm:git:${project.git.git.root}</connection>
+    <developerConnection>scm:git:${project.git.web.root}</developerConnection>
+    <url>${project.git.web.master}</url>
+    <tag>HEAD</tag>
+  </scm>
 
   <properties>
+    <project.git.project>utils-json</project.git.project>
+    <!-- utils -->
+    <version.utils-net-api>1.0.0</version.utils-net-api>
     <!-- json impl -->
-    <version.org.json>20180813</version.org.json>
-    <version.fastjson>1.2.56</version.fastjson>
-    <version.jackson-databind>2.7.9.5</version.jackson-databind>
-    <version.gson>2.8.5</version.gson>
-    <version.net.sf.json>2.4</version.net.sf.json>
+    <version.json>20210307</version.json>
+    <version.fastjson>1.2.76</version.fastjson>
+    <version.jackson>2.13.0-rc1</version.jackson>
+    <version.gson>2.8.7</version.gson>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <!-- utils -->
+      <dependency>
+        <groupId>io.github.dbstarll</groupId>
+        <artifactId>utils-net-api</artifactId>
+        <version>${version.utils-net-api}</version>
+      </dependency>
+      <!-- json impl -->
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>${version.json}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+        <version>${version.fastjson}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${version.jackson}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>${version.gson}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
+    <!-- utils -->
+    <dependency>
+      <groupId>io.github.dbstarll</groupId>
+      <artifactId>utils-net-api</artifactId>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
     <!-- json impl -->
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>${version.org.json}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
-      <version>${version.fastjson}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson-databind}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${version.gson}</version>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.json-lib</groupId>
-      <artifactId>json-lib</artifactId>
-      <version>${version.net.sf.json}</version>
-      <classifier>jdk15</classifier>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    <!-- support -->
-    <dependency>
-      <groupId>com.yeecloud.commons.utils</groupId>
-      <artifactId>utils-net-api</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>java-test</id>
+      <activation>
+        <file>
+          <exists>src/test/java</exists>
+        </file>
+      </activation>
+      <properties>
+        <version.junit>4.13.2</version.junit>
+        <version.surefire-junit47>3.0.0-M5</version.surefire-junit47>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>${version.junit}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>org.apache.maven.surefire</groupId>
+                  <artifactId>surefire-junit47</artifactId>
+                  <version>${version.surefire-junit47}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+    <profile>
+      <id>site-local</id>
+      <distributionManagement>
+        <site>
+          <id>local</id>
+          <url>${project.site.root.project}</url>
+        </site>
+      </distributionManagement>
+    </profile>
+  </profiles>
 </project>
