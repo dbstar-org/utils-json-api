@@ -1,16 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>io.github.dbstarll.parent</groupId>
     <artifactId>base</artifactId>
-    <version>1.1.9</version>
+    <version>1.2.0</version>
   </parent>
-  <groupId>io.github.dbstarll</groupId>
+  <groupId>io.github.dbstarll.utils</groupId>
   <artifactId>utils-json</artifactId>
   <version>1.0.1-SNAPSHOT</version>
 
-  <name>utils-json</name>
   <description>utils for json</description>
   <url>https://github.com/dbstarll/utils-json</url>
 
@@ -24,7 +24,7 @@
   <properties>
     <project.git.project>utils-json</project.git.project>
     <!-- utils -->
-    <version.utils-net-api>1.0.0</version.utils-net-api>
+    <version.utils-net-api>1.0.1</version.utils-net-api>
     <!-- json impl -->
     <version.json>20210307</version.json>
     <version.fastjson>1.2.76</version.fastjson>
@@ -36,7 +36,7 @@
     <dependencies>
       <!-- utils -->
       <dependency>
-        <groupId>io.github.dbstarll</groupId>
+        <groupId>io.github.dbstarll.utils</groupId>
         <artifactId>utils-net-api</artifactId>
         <version>${version.utils-net-api}</version>
       </dependency>
@@ -66,7 +66,7 @@
   <dependencies>
     <!-- utils -->
     <dependency>
-      <groupId>io.github.dbstarll</groupId>
+      <groupId>io.github.dbstarll.utils</groupId>
       <artifactId>utils-net-api</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
