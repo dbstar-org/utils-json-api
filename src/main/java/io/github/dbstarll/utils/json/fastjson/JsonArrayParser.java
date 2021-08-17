@@ -6,7 +6,7 @@ import io.github.dbstarll.utils.json.JsonParser;
 
 public class JsonArrayParser implements JsonParser<JSONArray> {
     @Override
-    public JSONArray parse(String str) {
+    public JSONArray parse(final String str) {
         return JSON.parseArray(str);
     }
 }

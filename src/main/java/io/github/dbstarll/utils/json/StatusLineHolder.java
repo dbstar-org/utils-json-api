@@ -3,17 +3,27 @@ package io.github.dbstarll.utils.json;
 import org.apache.http.StatusLine;
 
 public final class StatusLineHolder {
-    private static final ThreadLocal<StatusLine> holder = new ThreadLocal<StatusLine>();
+    private static final ThreadLocal<StatusLine> HOLDER = new ThreadLocal<StatusLine>();
 
     private StatusLineHolder() {
         // 禁止实例化
     }
 
+    /**
+     * 获取StatusLine.
+     *
+     * @return StatusLine
+     */
     public static StatusLine getStatusLine() {
-        return holder.get();
+        return HOLDER.get();
     }
 
-    public static void setStatusLine(StatusLine statusLine) {
-        holder.set(statusLine);
+    /**
+     * 设置StatusLine.
+     *
+     * @param statusLine StatusLine
+     */
+    public static void setStatusLine(final StatusLine statusLine) {
+        HOLDER.set(statusLine);
     }
 }

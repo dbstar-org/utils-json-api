@@ -12,12 +12,17 @@ import static org.apache.commons.lang3.Validate.notNull;
 public class JsonNodeParser implements JsonParser<JsonNode> {
     private final ObjectMapper mapper;
 
-    public JsonNodeParser(ObjectMapper mapper) {
+    /**
+     * 构建JsonNodeParser.
+     *
+     * @param mapper ObjectMapper
+     */
+    public JsonNodeParser(final ObjectMapper mapper) {
         this.mapper = notNull(mapper, "mapper is null");
     }
 
     @Override
-    public JsonNode parse(String str) throws JsonParseException {
+    public JsonNode parse(final String str) throws JsonParseException {
         try {
             return mapper.readTree(str);
         } catch (IOException e) {

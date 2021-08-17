@@ -5,7 +5,7 @@ import org.json.JSONArray;
 
 public class JsonArrayParser implements JsonParser<JSONArray> {
     @Override
-    public JSONArray parse(String str) {
+    public JSONArray parse(final String str) {
         return new JSONArray(str);
     }
 }

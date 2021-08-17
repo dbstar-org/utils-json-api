@@ -10,19 +10,20 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 
 public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
+    private static final int ERROR_STATUS_CODE = 300;
     private final JsonParser<T> jsonParser;
     private final boolean alwaysProcessEntity;
 
-    private JsonResponseHandler(JsonParser<T> jsonParser, boolean alwaysProcessEntity) {
+    private JsonResponseHandler(final JsonParser<T> jsonParser, final boolean alwaysProcessEntity) {
         this.jsonParser = jsonParser;
         this.alwaysProcessEntity = alwaysProcessEntity;
     }
 
     @Override
-    public T handleResponse(HttpResponse response) throws HttpResponseException, IOException {
+    public T handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
-        if (statusLine.getStatusCode() >= 300 && (entity == null || !alwaysProcessEntity)) {
+        if (statusLine.getStatusCode() >= ERROR_STATUS_CODE && (entity == null || !alwaysProcessEntity)) {
             EntityUtils.consume(entity);
             throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
         }
@@ -31,15 +32,30 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     }
 
     @Override
-    public T handleEntity(HttpEntity entity) throws IOException {
+    public T handleEntity(final HttpEntity entity) throws IOException {
         return jsonParser.parse(EntityUtils.toString(entity));
     }
 
-    public static <T> JsonResponseHandler<T> create(JsonParser<T> jsonParser) {
+    /**
+     * 构建JsonResponseHandler.
+     *
+     * @param jsonParser json解析器
+     * @param <T>        解析结果类型
+     * @return JsonResponseHandler
+     */
+    public static <T> JsonResponseHandler<T> create(final JsonParser<T> jsonParser) {
         return create(jsonParser, false);
     }
 
-    public static <T> JsonResponseHandler<T> create(JsonParser<T> jsonParser, boolean alwaysProcessEntity) {
+    /**
+     * 构建JsonResponseHandler.
+     *
+     * @param jsonParser          json解析器
+     * @param alwaysProcessEntity 在返回错误的状态码时，是否还要继续解析entity
+     * @param <T>                 解析结果类型
+     * @return JsonResponseHandler
+     */
+    public static <T> JsonResponseHandler<T> create(final JsonParser<T> jsonParser, final boolean alwaysProcessEntity) {
         return new JsonResponseHandler<T>(jsonParser, alwaysProcessEntity);
     }
 }

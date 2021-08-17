@@ -13,21 +13,21 @@ public class JsonResponseHandlerFactory extends AbstractResponseHandlerFactory {
    *
    * @param mapper ObjectMapper
    */
-  public JsonResponseHandlerFactory(ObjectMapper mapper) {
-    addResponseHandler(JsonNode.class, JsonResponseHandler.create(new JsonNodeParser(mapper)));
-    addResponseHandler(ObjectNode.class, JsonResponseHandler.create(new JsonObjectParser(mapper)));
-    addResponseHandler(ArrayNode.class, JsonResponseHandler.create(new JsonArrayParser(mapper)));
+  public JsonResponseHandlerFactory(final ObjectMapper mapper) {
+      addResponseHandler(JsonNode.class, JsonResponseHandler.create(new JsonNodeParser(mapper)));
+      addResponseHandler(ObjectNode.class, JsonResponseHandler.create(new JsonObjectParser(mapper)));
+      addResponseHandler(ArrayNode.class, JsonResponseHandler.create(new JsonArrayParser(mapper)));
   }
 
-  /**
-   * 创建JsonResponseHandlerFactory.
-   *
-   * @param mapper              ObjectMapper
-   * @param alwaysProcessEntity 在status异常时是否仍旧处理Entity
-   */
-  public JsonResponseHandlerFactory(ObjectMapper mapper, boolean alwaysProcessEntity) {
-    addResponseHandler(JsonNode.class, JsonResponseHandler.create(new JsonNodeParser(mapper), alwaysProcessEntity));
-    addResponseHandler(ObjectNode.class, JsonResponseHandler.create(new JsonObjectParser(mapper), alwaysProcessEntity));
-    addResponseHandler(ArrayNode.class, JsonResponseHandler.create(new JsonArrayParser(mapper), alwaysProcessEntity));
+    /**
+     * 创建JsonResponseHandlerFactory.
+     *
+     * @param mapper              ObjectMapper
+     * @param alwaysProcessEntity 在status异常时是否仍旧处理Entity
+     */
+    public JsonResponseHandlerFactory(final ObjectMapper mapper, final boolean alwaysProcessEntity) {
+        addResponseHandler(JsonNode.class, JsonResponseHandler.create(new JsonNodeParser(mapper), alwaysProcessEntity));
+        addResponseHandler(ObjectNode.class, JsonResponseHandler.create(new JsonObjectParser(mapper), alwaysProcessEntity));
+        addResponseHandler(ArrayNode.class, JsonResponseHandler.create(new JsonArrayParser(mapper), alwaysProcessEntity));
   }
 }

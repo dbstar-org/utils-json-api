@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public class JsonObjectParser implements JsonParser<JSONObject> {
     @Override
-    public JSONObject parse(String str) {
+    public JSONObject parse(final String str) {
         return new JSONObject(str);
     }
 }

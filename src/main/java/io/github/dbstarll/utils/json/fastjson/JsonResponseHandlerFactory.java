@@ -6,8 +6,11 @@ import io.github.dbstarll.utils.http.client.response.AbstractResponseHandlerFact
 import io.github.dbstarll.utils.json.JsonResponseHandler;
 
 public class JsonResponseHandlerFactory extends AbstractResponseHandlerFactory {
-  public JsonResponseHandlerFactory() {
-    addResponseHandler(JSONObject.class, JsonResponseHandler.create(new JsonObjectParser()));
-    addResponseHandler(JSONArray.class, JsonResponseHandler.create(new JsonArrayParser()));
-  }
+    /**
+     * 构建JsonResponseHandlerFactory.
+     */
+    public JsonResponseHandlerFactory() {
+        addResponseHandler(JSONObject.class, JsonResponseHandler.create(new JsonObjectParser()));
+        addResponseHandler(JSONArray.class, JsonResponseHandler.create(new JsonArrayParser()));
+    }
 }

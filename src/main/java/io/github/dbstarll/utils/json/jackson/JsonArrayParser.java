@@ -10,12 +10,17 @@ import static org.apache.commons.lang3.Validate.notNull;
 public class JsonArrayParser implements JsonParser<ArrayNode> {
     private final ObjectMapper mapper;
 
-    public JsonArrayParser(ObjectMapper mapper) {
+    /**
+     * 构建JsonArrayParser.
+     *
+     * @param mapper ObjectMapper
+     */
+    public JsonArrayParser(final ObjectMapper mapper) {
         this.mapper = notNull(mapper, "mapper is null");
     }
 
     @Override
-    public ArrayNode parse(String str) throws JsonParseException {
+    public ArrayNode parse(final String str) throws JsonParseException {
         try {
             return (ArrayNode) mapper.readTree(str);
         } catch (Throwable e) {

@@ -9,12 +9,17 @@ import static org.apache.commons.lang3.Validate.notNull;
 public class JsonArrayParser implements JsonParser<JsonArray> {
     private final Gson gson;
 
-    public JsonArrayParser(Gson gson) {
+    /**
+     * 构造JsonArrayParser.
+     *
+     * @param gson gson对象
+     */
+    public JsonArrayParser(final Gson gson) {
         this.gson = notNull(gson, "gson is null");
     }
 
     @Override
-    public JsonArray parse(String str) {
+    public JsonArray parse(final String str) {
         return gson.fromJson(str, JsonArray.class);
     }
 }

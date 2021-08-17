@@ -5,7 +5,7 @@ import io.github.dbstarll.utils.net.api.ApiClient;
 import org.apache.http.client.HttpClient;
 
 public abstract class JsonApiClient extends ApiClient {
-    public JsonApiClient(HttpClient httpClient, Gson gson) {
+    protected JsonApiClient(final HttpClient httpClient, final Gson gson) {
         super(httpClient);
         setResponseHandlerFactory(new JsonResponseHandlerFactory(gson));
     }
