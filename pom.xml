@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>io.github.dbstarll.parent</groupId>
     <artifactId>base</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.9</version>
   </parent>
   <groupId>io.github.dbstarll.utils</groupId>
   <artifactId>utils-json</artifactId>
@@ -23,12 +24,12 @@
   <properties>
     <project.git.project>utils-json</project.git.project>
     <!-- utils -->
-    <version.utils-net-api>1.0.1</version.utils-net-api>
+    <version.utils-net-api>1.0.2</version.utils-net-api>
     <!-- json impl -->
-    <version.json>20210307</version.json>
-    <version.fastjson>1.2.76</version.fastjson>
-    <version.jackson>2.13.0-rc1</version.jackson>
-    <version.gson>2.8.7</version.gson>
+    <version.json>20220924</version.json>
+    <version.fastjson2>2.0.23</version.fastjson2>
+    <version.jackson>2.14.1</version.jackson>
+    <version.gson>2.10.1</version.gson>
   </properties>
 
   <dependencyManagement>
@@ -46,9 +47,9 @@
         <version>${version.json}</version>
       </dependency>
       <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>fastjson</artifactId>
-        <version>${version.fastjson}</version>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2</artifactId>
+        <version>${version.fastjson2}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -78,8 +79,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>fastjson</artifactId>
+      <groupId>com.alibaba.fastjson2</groupId>
+      <artifactId>fastjson2</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
@@ -107,7 +108,7 @@
       </activation>
       <properties>
         <version.junit>4.13.2</version.junit>
-        <version.surefire-junit47>3.0.0-M5</version.surefire-junit47>
+        <version.surefire-junit47>3.0.0-M8</version.surefire-junit47>
       </properties>
       <dependencies>
         <dependency>

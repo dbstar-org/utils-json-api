@@ -1,7 +1,7 @@
 package io.github.dbstarll.utils.json.fastjson;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.github.dbstarll.utils.http.client.response.AbstractResponseHandlerFactory;
 import io.github.dbstarll.utils.json.JsonResponseHandler;
 
