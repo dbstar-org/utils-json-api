@@ -1,0 +1,62 @@
+name: verify-sonar
+
+on:
+  push:
+    branches:
+      - main
+      - snapshot-*
+  workflow_dispatch:
+
+jobs:
+  verify-sonar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+
+      - name: Generate Maven Settings
+        uses: whelk-io/maven-settings-xml-action@v18
+        with:
+          repositories: >
+            [
+              {
+                "id": "github",
+                "url": "https://maven.pkg.github.com/${env.GITHUB_ACTOR}/*"
+              }
+            ]
+          servers: >
+            [
+              {
+                "id": "github",
+                "username": "${env.GITHUB_ACTOR}",
+                "password": "${{ secrets.GITHUB_TOKEN }}"
+              }
+            ]
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Verify with Maven with SonarQube
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B -U verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
