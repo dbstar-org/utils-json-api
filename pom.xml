@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.github.dbstarll.utils</groupId>
   <artifactId>utils-json</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
 
   <description>utils for json</description>
   <url>https://github.com/dbstarll/utils-json</url>
@@ -17,7 +17,7 @@
     <connection>scm:git:${project.git.git.root}</connection>
     <developerConnection>scm:git:${project.git.web.root}</developerConnection>
     <url>${project.git.web.master}</url>
-    <tag>v1.0.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
