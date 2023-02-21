@@ -10,8 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class StatusLineHolderTest {
     @Test
-    void statusLine() {
-        new Thread(() -> assertNull(StatusLineHolder.getStatusLine())).start();
+    void statusLine() throws InterruptedException {
+        final Thread thread = new Thread(() -> assertNull(StatusLineHolder.getStatusLine()));
+        thread.start();
+        thread.join();
 
         final StatusLine statusLine = new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "ok");
         StatusLineHolder.setStatusLine(statusLine);
