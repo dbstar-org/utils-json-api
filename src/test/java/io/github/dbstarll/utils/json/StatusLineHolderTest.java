@@ -1,17 +1,16 @@
-package test.io.github.dbstarll.utils.json;
+package io.github.dbstarll.utils.json;
 
-import io.github.dbstarll.utils.json.StatusLineHolder;
 import org.apache.http.HttpVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.message.BasicStatusLine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class StatusLineHolderTest {
+class StatusLineHolderTest {
     @Test
-    public void statusLine() {
+    void statusLine() {
         assertNull(StatusLineHolder.getStatusLine());
 
         final StatusLine statusLine = new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "ok");

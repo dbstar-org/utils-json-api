@@ -1,38 +1,39 @@
-package test.io.github.dbstarll.utils.json.fastjson;
+package io.github.dbstarll.utils.json.fastjson;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import io.github.dbstarll.utils.json.fastjson.JsonArrayParser;
 import io.github.dbstarll.utils.json.test.Model;
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-public class TestJsonArrayParser extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class TestJsonArrayParser {
     private Model model1;
     private Model model2;
     private String jsonArray;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    void setUp() {
         this.model1 = new Model(100, "stringValue1", true, 3.14f, new int[]{1, 2, 3, 4, 5});
         this.model2 = new Model(101, "stringValue2", false, 1.41f, new int[]{5, 4, 3, 2, 1});
         this.jsonArray = JSON.toJSONString(Arrays.asList(model1, model2));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() {
         this.model1 = null;
         this.model2 = null;
         this.jsonArray = null;
-        super.tearDown();
     }
 
     @Test
-    public void testParse() {
+    void testParse() {
         final JSONArray array = new JsonArrayParser().parse(jsonArray);
         assertNotNull(array);
         assertEquals(2, array.size());
