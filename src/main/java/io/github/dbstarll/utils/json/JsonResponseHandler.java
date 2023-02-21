@@ -23,8 +23,10 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     public T handleResponse(final HttpResponse response) throws IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
-        if (statusLine.getStatusCode() >= ERROR_STATUS_CODE && (entity == null || !alwaysProcessEntity)) {
-            EntityUtils.consume(entity);
+        if (statusLine.getStatusCode() >= ERROR_STATUS_CODE && !alwaysProcessEntity) {
+            if (entity != null) {
+                EntityUtils.consume(entity);
+            }
             throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
         }
         StatusLineHolder.setStatusLine(statusLine);
