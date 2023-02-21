@@ -9,16 +9,6 @@ public class JsonResponseHandlerFactory extends JsonParserResponseHandlerFactory
     /**
      * 构建JsonResponseHandlerFactory.
      *
-     * @param gson Gson
-     */
-    public JsonResponseHandlerFactory(final Gson gson) {
-        addResponseHandler(JsonObject.class, new JsonObjectParser(gson));
-        addResponseHandler(JsonArray.class, new JsonArrayParser(gson));
-    }
-
-    /**
-     * 构建JsonResponseHandlerFactory.
-     *
      * @param gson                Gson
      * @param alwaysProcessEntity 在status异常时是否仍旧处理Entity
      */

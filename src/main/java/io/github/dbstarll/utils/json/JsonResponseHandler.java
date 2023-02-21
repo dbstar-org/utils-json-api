@@ -39,17 +39,6 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     /**
      * 构建JsonResponseHandler.
      *
-     * @param jsonParser json解析器
-     * @param <T>        解析结果类型
-     * @return JsonResponseHandler
-     */
-    public static <T> JsonResponseHandler<T> create(final JsonParser<T> jsonParser) {
-        return create(jsonParser, false);
-    }
-
-    /**
-     * 构建JsonResponseHandler.
-     *
      * @param jsonParser          json解析器
      * @param alwaysProcessEntity 在返回错误的状态码时，是否还要继续解析entity
      * @param <T>                 解析结果类型
