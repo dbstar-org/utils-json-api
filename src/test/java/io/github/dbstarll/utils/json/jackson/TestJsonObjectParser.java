@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestJsonObjectParser {
     private ObjectMapper mapper;
@@ -36,7 +37,7 @@ class TestJsonObjectParser {
         assertEquals(5, json.size());
         assertEquals(100, json.get("intValue").asInt());
         assertEquals("stringValue1", json.get("stringValue").asText());
-        assertEquals(true, json.get("booleanValue").asBoolean());
+        assertTrue(json.get("booleanValue").asBoolean());
         assertEquals(3.14, json.get("floatValue").asDouble());
         assertEquals("[1,2,3,4,5]", json.get("intArray").toString());
     }

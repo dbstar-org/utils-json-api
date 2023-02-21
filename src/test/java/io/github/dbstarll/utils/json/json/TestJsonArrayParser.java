@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TestJsonArrayParser {
@@ -41,7 +42,7 @@ class TestJsonArrayParser {
         assertEquals(5, json.length());
         assertEquals(101, json.optInt("intValue"));
         assertEquals("stringValue2", json.optString("stringValue"));
-        assertEquals(false, json.optBoolean("booleanValue"));
+        assertFalse(json.optBoolean("booleanValue"));
         assertEquals(1.41f, json.optFloat("floatValue"));
         assertEquals("[5,4,3,2,1]", json.optJSONArray("intArray").toString());
     }

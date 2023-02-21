@@ -20,7 +20,7 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     }
 
     @Override
-    public T handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
+    public T handleResponse(final HttpResponse response) throws IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
         if (statusLine.getStatusCode() >= ERROR_STATUS_CODE && (entity == null || !alwaysProcessEntity)) {
@@ -56,6 +56,6 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
      * @return JsonResponseHandler
      */
     public static <T> JsonResponseHandler<T> create(final JsonParser<T> jsonParser, final boolean alwaysProcessEntity) {
-        return new JsonResponseHandler<T>(jsonParser, alwaysProcessEntity);
+        return new JsonResponseHandler<>(jsonParser, alwaysProcessEntity);
     }
 }

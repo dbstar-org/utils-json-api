@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.github.dbstarll.utils.http.client.response.AbstractResponseHandlerFactory;
-import io.github.dbstarll.utils.json.JsonResponseHandler;
+import io.github.dbstarll.utils.json.JsonParserResponseHandlerFactory;
 
-public class JsonResponseHandlerFactory extends AbstractResponseHandlerFactory {
-  /**
-   * 创建JsonResponseHandlerFactory.
-   *
-   * @param mapper ObjectMapper
-   */
-  public JsonResponseHandlerFactory(final ObjectMapper mapper) {
-      addResponseHandler(JsonNode.class, JsonResponseHandler.create(new JsonNodeParser(mapper)));
-      addResponseHandler(ObjectNode.class, JsonResponseHandler.create(new JsonObjectParser(mapper)));
-      addResponseHandler(ArrayNode.class, JsonResponseHandler.create(new JsonArrayParser(mapper)));
-  }
+public class JsonResponseHandlerFactory extends JsonParserResponseHandlerFactory {
+    /**
+     * 创建JsonResponseHandlerFactory.
+     *
+     * @param mapper ObjectMapper
+     */
+    public JsonResponseHandlerFactory(final ObjectMapper mapper) {
+        addResponseHandler(JsonNode.class, new JsonNodeParser(mapper));
+        addResponseHandler(ObjectNode.class, new JsonObjectParser(mapper));
+        addResponseHandler(ArrayNode.class, new JsonArrayParser(mapper));
+    }
 
     /**
      * 创建JsonResponseHandlerFactory.
@@ -26,8 +25,8 @@ public class JsonResponseHandlerFactory extends AbstractResponseHandlerFactory {
      * @param alwaysProcessEntity 在status异常时是否仍旧处理Entity
      */
     public JsonResponseHandlerFactory(final ObjectMapper mapper, final boolean alwaysProcessEntity) {
-        addResponseHandler(JsonNode.class, JsonResponseHandler.create(new JsonNodeParser(mapper), alwaysProcessEntity));
-        addResponseHandler(ObjectNode.class, JsonResponseHandler.create(new JsonObjectParser(mapper), alwaysProcessEntity));
-        addResponseHandler(ArrayNode.class, JsonResponseHandler.create(new JsonArrayParser(mapper), alwaysProcessEntity));
-  }
+        addResponseHandler(JsonNode.class, new JsonNodeParser(mapper), alwaysProcessEntity);
+        addResponseHandler(ObjectNode.class, new JsonObjectParser(mapper), alwaysProcessEntity);
+        addResponseHandler(ArrayNode.class, new JsonArrayParser(mapper), alwaysProcessEntity);
+    }
 }

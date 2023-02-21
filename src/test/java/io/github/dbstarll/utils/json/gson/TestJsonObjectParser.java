@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestJsonObjectParser {
     private Gson gson;
@@ -37,7 +38,7 @@ class TestJsonObjectParser {
         assertEquals(5, json.size());
         assertEquals(100, json.get("intValue").getAsInt());
         assertEquals("stringValue1", json.get("stringValue").getAsString());
-        assertEquals(true, json.get("booleanValue").getAsBoolean());
+        assertTrue(json.get("booleanValue").getAsBoolean());
         assertEquals(3.14f, json.get("floatValue").getAsFloat());
         assertEquals("[1,2,3,4,5]", json.get("intArray").getAsJsonArray().toString());
     }
