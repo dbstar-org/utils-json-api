@@ -1,7 +1,9 @@
 package io.github.dbstarll.utils.json.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.dbstarll.utils.json.JsonParseException;
 import io.github.dbstarll.utils.json.test.Model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestJsonObjectParser {
@@ -31,7 +34,7 @@ class TestJsonObjectParser {
     }
 
     @Test
-    void testParse() throws Exception {
+    void parse() throws Exception {
         final ObjectNode json = new JsonObjectParser(mapper).parse(jsonObject);
         assertNotNull(json);
         assertEquals(5, json.size());
@@ -40,5 +43,13 @@ class TestJsonObjectParser {
         assertTrue(json.get("booleanValue").asBoolean());
         assertEquals(3.14, json.get("floatValue").asDouble());
         assertEquals("[1,2,3,4,5]", json.get("intArray").toString());
+    }
+
+    @Test
+    void failed() {
+        final Exception e = assertThrowsExactly(JsonParseException.class, () -> new JsonObjectParser(mapper).parse("[]"));
+        assertNotNull(e.getCause());
+        assertEquals(ClassCastException.class, e.getCause().getClass());
+        assertEquals(ArrayNode.class.getName() + " cannot be cast to " + ObjectNode.class.getName(), e.getCause().getMessage());
     }
 }
