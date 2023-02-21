@@ -23,7 +23,7 @@ public class JsonArrayParser implements JsonParser<ArrayNode> {
     public ArrayNode parse(final String str) throws JsonParseException {
         try {
             return (ArrayNode) mapper.readTree(str);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new JsonParseException(e);
         }
     }
