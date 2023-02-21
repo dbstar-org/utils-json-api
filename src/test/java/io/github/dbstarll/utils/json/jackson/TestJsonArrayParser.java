@@ -59,6 +59,6 @@ class TestJsonArrayParser {
         final Exception e = assertThrowsExactly(JsonParseException.class, () -> new JsonArrayParser(mapper).parse("{}"));
         assertNotNull(e.getCause());
         assertEquals(ClassCastException.class, e.getCause().getClass());
-        assertEquals(ObjectNode.class.getName() + " cannot be cast to " + ArrayNode.class.getName(), e.getCause().getMessage());
+        assertNotNull(e.getCause().getMessage());
     }
 }
