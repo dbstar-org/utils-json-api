@@ -44,18 +44,18 @@ class JsonResponseHandlerTest extends JsonApiClientTestCase {
     }
 
     @Test
+    void handleNoEntity() throws IOException {
+        final ResponseHandler<String> responseHandler = JsonResponseHandler.create(stringParser, false);
+        final BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, "ok");
+        assertNull(responseHandler.handleResponse(response));
+    }
+
+    @Test
     void errorNoEntity() {
         final ResponseHandler<String> responseHandler = JsonResponseHandler.create(stringParser, false);
         final BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1, 404, "Client Error");
         final Exception e = assertThrowsExactly(HttpResponseException.class, () -> responseHandler.handleResponse(response));
         assertEquals("status code: 404, reason phrase: Client Error", e.getMessage());
-    }
-
-    @Test
-    void errorNoProcessEntity() throws IOException {
-        final ResponseHandler<String> responseHandler = JsonResponseHandler.create(stringParser, true);
-        final BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1, 404, "Client Error");
-        assertNull(responseHandler.handleResponse(response));
     }
 
     @Test
