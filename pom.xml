@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -106,34 +107,23 @@
         </file>
       </activation>
       <properties>
-        <version.junit>4.13.2</version.junit>
-        <version.surefire-junit47>3.0.0-M8</version.surefire-junit47>
+        <version.mockwebserver>4.9.3</version.mockwebserver>
+        <version.logback>1.3.5</version.logback>
       </properties>
       <dependencies>
         <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>${version.junit}</version>
+          <groupId>com.squareup.okhttp3</groupId>
+          <artifactId>mockwebserver</artifactId>
+          <version>${version.mockwebserver}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+          <version>${version.logback}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>org.apache.maven.surefire</groupId>
-                  <artifactId>surefire-junit47</artifactId>
-                  <version>${version.surefire-junit47}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
 
     <profile>

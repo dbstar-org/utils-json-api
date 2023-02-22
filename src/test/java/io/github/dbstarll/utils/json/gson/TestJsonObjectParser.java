@@ -1,42 +1,44 @@
-package test.io.github.dbstarll.utils.json.gson;
+package io.github.dbstarll.utils.json.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import io.github.dbstarll.utils.json.gson.JsonObjectParser;
 import io.github.dbstarll.utils.json.test.Model;
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestJsonObjectParser extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class TestJsonObjectParser {
     private Gson gson;
     private Model model1;
     private String jsonObject;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    void setUp() {
         this.gson = new GsonBuilder().create();
         this.model1 = new Model(100, "stringValue1", true, 3.14f, new int[]{1, 2, 3, 4, 5});
         this.jsonObject = gson.toJson(model1);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() {
         this.gson = null;
         this.model1 = null;
         this.jsonObject = null;
-        super.tearDown();
     }
 
     @Test
-    public void testParse() {
+    void testParse() {
         final JsonObject json = new JsonObjectParser(gson).parse(jsonObject);
         assertNotNull(json);
         assertEquals(5, json.size());
         assertEquals(100, json.get("intValue").getAsInt());
         assertEquals("stringValue1", json.get("stringValue").getAsString());
-        assertEquals(true, json.get("booleanValue").getAsBoolean());
+        assertTrue(json.get("booleanValue").getAsBoolean());
         assertEquals(3.14f, json.get("floatValue").getAsFloat());
         assertEquals("[1,2,3,4,5]", json.get("intArray").getAsJsonArray().toString());
     }

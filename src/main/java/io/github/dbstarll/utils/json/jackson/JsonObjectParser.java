@@ -23,7 +23,7 @@ public class JsonObjectParser implements JsonParser<ObjectNode> {
     public ObjectNode parse(final String str) throws JsonParseException {
         try {
             return (ObjectNode) mapper.readTree(str);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new JsonParseException(e);
         }
     }

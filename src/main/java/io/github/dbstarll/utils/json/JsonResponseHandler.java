@@ -20,11 +20,13 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     }
 
     @Override
-    public T handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
+    public T handleResponse(final HttpResponse response) throws IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
         if (statusLine.getStatusCode() >= ERROR_STATUS_CODE && (entity == null || !alwaysProcessEntity)) {
-            EntityUtils.consume(entity);
+            if (entity != null) {
+                EntityUtils.consume(entity);
+            }
             throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
         }
         StatusLineHolder.setStatusLine(statusLine);
@@ -39,23 +41,12 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     /**
      * 构建JsonResponseHandler.
      *
-     * @param jsonParser json解析器
-     * @param <T>        解析结果类型
-     * @return JsonResponseHandler
-     */
-    public static <T> JsonResponseHandler<T> create(final JsonParser<T> jsonParser) {
-        return create(jsonParser, false);
-    }
-
-    /**
-     * 构建JsonResponseHandler.
-     *
      * @param jsonParser          json解析器
      * @param alwaysProcessEntity 在返回错误的状态码时，是否还要继续解析entity
      * @param <T>                 解析结果类型
      * @return JsonResponseHandler
      */
     public static <T> JsonResponseHandler<T> create(final JsonParser<T> jsonParser, final boolean alwaysProcessEntity) {
-        return new JsonResponseHandler<T>(jsonParser, alwaysProcessEntity);
+        return new JsonResponseHandler<>(jsonParser, alwaysProcessEntity);
     }
 }
