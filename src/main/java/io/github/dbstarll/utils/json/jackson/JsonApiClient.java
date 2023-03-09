@@ -22,7 +22,10 @@ public abstract class JsonApiClient extends ApiClient {
 
     protected final <T> T execute(final HttpUriRequest request, final JavaType javaType)
             throws IOException, ApiException {
-        return mapper.convertValue(super.execute(request, JsonNode.class), javaType);
+        final JsonNode executeResult = super.execute(request, JsonNode.class);
+        final T convertResult = mapper.convertValue(executeResult, javaType);
+        logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
+        return convertResult;
     }
 
     protected final <T> T executeObject(final HttpUriRequest request, final Class<T> responseClass)
