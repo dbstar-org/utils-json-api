@@ -1,16 +1,17 @@
 package io.github.dbstarll.utils.json;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.impl.client.AbstractResponseHandler;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.HttpResponseException;
+import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.StatusLine;
 
 import java.io.IOException;
 
-public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
-    private static final int ERROR_STATUS_CODE = 300;
+public final class JsonResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
     private final JsonParser<T> jsonParser;
     private final boolean alwaysProcessEntity;
 
@@ -20,22 +21,23 @@ public final class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
     }
 
     @Override
-    public T handleResponse(final HttpResponse response) throws IOException {
-        final StatusLine statusLine = response.getStatusLine();
+    public T handleResponse(final ClassicHttpResponse response) throws IOException {
         final HttpEntity entity = response.getEntity();
-        if (statusLine.getStatusCode() >= ERROR_STATUS_CODE && (entity == null || !alwaysProcessEntity)) {
-            if (entity != null) {
-                EntityUtils.consume(entity);
-            }
-            throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+        if (response.getCode() >= HttpStatus.SC_REDIRECTION && (entity == null || !alwaysProcessEntity)) {
+            EntityUtils.consume(entity);
+            throw new HttpResponseException(response.getCode(), response.getReasonPhrase());
         }
-        StatusLineHolder.setStatusLine(statusLine);
+        StatusLineHolder.setStatusLine(new StatusLine(response));
         return entity == null ? null : handleEntity(entity);
     }
 
     @Override
     public T handleEntity(final HttpEntity entity) throws IOException {
-        return jsonParser.parse(EntityUtils.toString(entity));
+        try {
+            return jsonParser.parse(EntityUtils.toString(entity));
+        } catch (ParseException e) {
+            throw new IOException(e);
+        }
     }
 
     /**

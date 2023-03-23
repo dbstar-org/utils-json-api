@@ -1,6 +1,6 @@
 package io.github.dbstarll.utils.json;
 
-import org.apache.http.StatusLine;
+import org.apache.hc.core5.http.message.StatusLine;
 
 public final class StatusLineHolder {
     private static final ThreadLocal<StatusLine> HOLDER = new ThreadLocal<>();

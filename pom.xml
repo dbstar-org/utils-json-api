@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.github.dbstarll.utils</groupId>
   <artifactId>utils-json</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
 
   <description>utils for json</description>
   <url>https://github.com/dbstar-org/utils-json</url>
@@ -23,7 +23,7 @@
   <properties>
     <project.git.project>utils-json</project.git.project>
     <!-- utils -->
-    <version.utils-net-api>1.0.4</version.utils-net-api>
+    <version.utils-net-api>1.1.0-SNAPSHOT</version.utils-net-api>
     <!-- json impl -->
     <version.json>20220924</version.json>
     <version.fastjson2>2.0.24</version.fastjson2>
