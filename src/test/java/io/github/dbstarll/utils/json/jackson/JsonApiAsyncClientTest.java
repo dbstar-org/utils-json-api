@@ -127,6 +127,25 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         }, s -> s.enqueue(new MockResponse().setBody(jsonArray)));
     }
 
+    @Test
+    void stream() throws Throwable {
+        useApi((s, c) -> {
+            final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
+            final List<Model> array = c.stream(callback).get();
+            callback.assertResult(array);
+            assertEquals(array, callback.results);
+            assertNotNull(array);
+            assertEquals(2, array.size());
+
+            final Model model = array.get(1);
+            assertEquals(101, model.getIntValue());
+            assertEquals("stringValue2", model.getStringValue());
+            assertFalse(model.isBooleanValue());
+            assertEquals(1.41, model.getFloatValue(), 0.0001);
+            assertArrayEquals(new int[]{5, 4, 3, 2, 1}, model.getIntArray());
+        }, s -> s.enqueue(new MockResponse().setBody(jsonObject + "\n" + mapper.writeValueAsString(model2))));
+    }
+
     private static class MyApiClient extends JsonApiAsyncClient {
         public MyApiClient(final HttpAsyncClient httpClient, final String uriBase, final ObjectMapper mapper) {
             super(httpClient, true, mapper);
@@ -147,6 +166,10 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
 
         public Future<List<Model>> models(final FutureCallback<List<Model>> callback) throws ApiException, IOException {
             return executeArray(get("/ping.html").build(), Model.class, callback);
+        }
+
+        public Future<List<Model>> stream(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
+            return executeObject(get("/ping.html").build(), Model.class, callback);
         }
     }
 
