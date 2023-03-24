@@ -1,8 +1,12 @@
 package io.github.dbstarll.utils.json.jackson;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
+import com.fasterxml.jackson.databind.util.ByteBufferBackedOutputStream;
 import io.github.dbstarll.utils.http.client.request.RelativeUriResolver;
 import io.github.dbstarll.utils.json.JsonApiClientTestCase;
 import io.github.dbstarll.utils.json.ThrowingBiConsumer;
@@ -19,6 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -144,6 +152,26 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertEquals(1.41, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{5, 4, 3, 2, 1}, model.getIntArray());
         }, s -> s.enqueue(new MockResponse().setBody(jsonObject + "\n" + mapper.writeValueAsString(model2))));
+    }
+
+    @Test
+    void reader() throws Exception {
+        final String content = jsonObject + "\n " + mapper.writeValueAsString(model2) + "\n";
+        final ByteBuffer buffer = ByteBuffer.wrap(content.getBytes(StandardCharsets.UTF_8));
+        while (buffer.remaining() > 0) {
+            System.out.printf("limit: %s, position: %s, remaining: %s\n", buffer.limit(), buffer.position(), buffer.remaining());
+            try (InputStream in = new ByteBufferBackedInputStream(buffer)) {
+                try (JsonParser parser = mapper.createParser(in)) {
+                    System.out.println((JsonNode) mapper.readTree(parser));
+                    buffer.clear();
+                    try (OutputStream out = new ByteBufferBackedOutputStream(buffer)) {
+                        System.out.println(parser.releaseBuffered(out));
+                        buffer.flip();
+                    }
+                }
+            }
+        }
+        System.out.printf("limit: %s, position: %s, remaining: %s\n", buffer.limit(), buffer.position(), buffer.remaining());
     }
 
     private static class MyApiClient extends JsonApiAsyncClient {
