@@ -1,7 +1,5 @@
 package io.github.dbstarll.utils.json.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -11,6 +9,7 @@ import io.github.dbstarll.utils.json.ThrowingBiConsumer;
 import io.github.dbstarll.utils.json.test.Model;
 import io.github.dbstarll.utils.net.api.ApiException;
 import io.github.dbstarll.utils.net.api.StreamFutureCallback;
+import io.github.dbstarll.utils.net.api.index.Index;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -133,7 +131,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     @Test
     void stream() throws Throwable {
         useApi((s, c) -> {
-            final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
+            final MyStreamFutureCallback<Model, JavaTypeIndex<Model>> callback = new MyStreamFutureCallback<>();
             final List<Model> array = c.stream(callback).get();
             callback.assertResult(array);
             assertEquals(array, callback.results);
@@ -147,20 +145,6 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertEquals(1.41, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{5, 4, 3, 2, 1}, model.getIntArray());
         }, s -> s.enqueue(new MockResponse().setBody(jsonObject + "\n" + mapper.writeValueAsString(model2))));
-    }
-
-    @Test
-    void reader() throws Exception {
-        String content = jsonObject + "\n " + mapper.writeValueAsString(model2) + "\n";
-        while (content.length() > 0) {
-            try (JsonParser parser = mapper.createParser(content)) {
-                System.out.println((JsonNode) mapper.readTree(parser));
-                try (StringWriter out = new StringWriter()) {
-                    System.out.println(parser.releaseBuffered(out));
-                    content = out.toString();
-                }
-            }
-        }
     }
 
     private static class MyApiClient extends JsonApiAsyncClient {
@@ -185,7 +169,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             return executeArray(get("/ping.html").build(), Model.class, callback);
         }
 
-        public Future<List<Model>> stream(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
+        public Future<List<Model>> stream(final StreamFutureCallback<Model, JavaTypeIndex<Model>> callback) throws ApiException, IOException {
             return executeObject(get("/ping.html").build(), Model.class, callback);
         }
     }
@@ -249,12 +233,13 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         }
     }
 
-    private static class MyStreamFutureCallback<T> extends MyFutureCallback<List<T>> implements StreamFutureCallback<T> {
+    private static class MyStreamFutureCallback<T, I extends Index<T>> extends MyFutureCallback<List<T>>
+            implements StreamFutureCallback<T, I> {
         private final List<T> results = new ArrayList<>();
 
         @Override
-        public void stream(T result) {
-            results.add(result);
+        public void stream(I result) {
+            results.add(result.getData());
         }
     }
 }
