@@ -17,5 +17,6 @@ public class JsonResponseHandlerFactory extends JsonParserResponseHandlerFactory
         addResponseHandler(JsonNode.class, new JsonNodeParser(mapper), alwaysProcessEntity);
         addResponseHandler(ObjectNode.class, new JsonObjectParser(mapper), alwaysProcessEntity);
         addResponseHandler(ArrayNode.class, new JsonArrayParser(mapper), alwaysProcessEntity);
+        addResponseHandler(JsonNodeIndex.class, new JsonNodeIndexParser(mapper), alwaysProcessEntity);
     }
 }

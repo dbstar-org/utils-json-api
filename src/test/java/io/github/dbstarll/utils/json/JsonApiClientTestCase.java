@@ -3,7 +3,9 @@ package io.github.dbstarll.utils.json;
 import io.github.dbstarll.utils.http.client.HttpClientFactory;
 import io.github.dbstarll.utils.json.test.Model;
 import okhttp3.mockwebserver.MockWebServer;
+import org.apache.hc.client5.http.async.HttpAsyncClient;
 import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,11 +36,20 @@ public abstract class JsonApiClientTestCase {
         }
     }
 
-
     protected final void useClient(final ThrowingBiConsumer<MockWebServer, HttpClient> consumer,
                                    final ThrowingConsumer<MockWebServer> customizer) throws Throwable {
         useServer(server -> {
-            try (CloseableHttpClient client = new HttpClientFactory().build()) {
+            try (CloseableHttpClient client = new HttpClientFactory().setAutomaticRetries(false).build()) {
+                consumer.accept(server, client);
+            }
+        }, customizer);
+    }
+
+    protected final void useAsyncClient(final ThrowingBiConsumer<MockWebServer, HttpAsyncClient> consumer,
+                                        final ThrowingConsumer<MockWebServer> customizer) throws Throwable {
+        useServer(server -> {
+            try (CloseableHttpAsyncClient client = new HttpClientFactory().setAutomaticRetries(false).buildAsync()) {
+                client.start();
                 consumer.accept(server, client);
             }
         }, customizer);

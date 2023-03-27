@@ -2,10 +2,10 @@ package io.github.dbstarll.utils.json;
 
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.StatusLine;
 
@@ -33,11 +33,7 @@ public final class JsonResponseHandler<T> extends AbstractHttpClientResponseHand
 
     @Override
     public T handleEntity(final HttpEntity entity) throws IOException {
-        try {
-            return jsonParser.parse(EntityUtils.toString(entity));
-        } catch (ParseException e) {
-            throw new IOException(e);
-        }
+        return jsonParser.parse(new BasicHttpClientResponseHandler().handleEntity(entity));
     }
 
     /**
