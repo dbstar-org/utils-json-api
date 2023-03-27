@@ -44,8 +44,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
     }
 
     protected final <T> Future<List<T>> execute(final ClassicHttpRequest request, final JavaType javaType,
-                                                final StreamFutureCallback<T, JavaTypeIndex<T>> callback)
-            throws IOException {
+                                                final StreamFutureCallback<T> callback) throws IOException {
         return execute(request, new StreamJavaTypeResponseHandler<>(mapper, getResponseHandler(JsonNodeIndex.class),
                 javaType, (handlerResult, convertResult) -> {
             logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
@@ -55,8 +54,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
     }
 
     protected final <T> Future<List<T>> executeObject(final ClassicHttpRequest request, final Class<T> responseClass,
-                                                      final StreamFutureCallback<T, JavaTypeIndex<T>> callback)
-            throws IOException {
+                                                      final StreamFutureCallback<T> callback) throws IOException {
         return execute(request, mapper.getTypeFactory().constructType(responseClass), callback);
     }
 }

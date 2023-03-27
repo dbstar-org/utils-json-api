@@ -39,7 +39,7 @@ public abstract class JsonApiClientTestCase {
     protected final void useClient(final ThrowingBiConsumer<MockWebServer, HttpClient> consumer,
                                    final ThrowingConsumer<MockWebServer> customizer) throws Throwable {
         useServer(server -> {
-            try (CloseableHttpClient client = new HttpClientFactory().build()) {
+            try (CloseableHttpClient client = new HttpClientFactory().setAutomaticRetries(false).build()) {
                 consumer.accept(server, client);
             }
         }, customizer);
@@ -48,7 +48,7 @@ public abstract class JsonApiClientTestCase {
     protected final void useAsyncClient(final ThrowingBiConsumer<MockWebServer, HttpAsyncClient> consumer,
                                         final ThrowingConsumer<MockWebServer> customizer) throws Throwable {
         useServer(server -> {
-            try (CloseableHttpAsyncClient client = new HttpClientFactory().buildAsync()) {
+            try (CloseableHttpAsyncClient client = new HttpClientFactory().setAutomaticRetries(false).buildAsync()) {
                 client.start();
                 consumer.accept(server, client);
             }
