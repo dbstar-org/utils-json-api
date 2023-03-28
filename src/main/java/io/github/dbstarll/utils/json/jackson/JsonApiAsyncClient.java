@@ -21,6 +21,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         super(httpClient);
         this.mapper = mapper;
         setResponseHandlerFactory(new JsonResponseHandlerFactory(mapper, alwaysProcessEntity));
+        setResponseHandlerFactory(new JsonIndexResponseHandlerFactory(mapper));
     }
 
     protected final <T> Future<T> execute(final ClassicHttpRequest request, final JavaType javaType,
@@ -43,8 +44,8 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         return execute(request, mapper.getTypeFactory().constructCollectionType(List.class, responseClass), callback);
     }
 
-    protected final <T> Future<List<T>> execute(final ClassicHttpRequest request, final JavaType javaType,
-                                                final StreamFutureCallback<T> callback) throws IOException {
+    protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
+                                             final StreamFutureCallback<T> callback) throws IOException {
         return execute(request, new StreamJavaTypeResponseHandler<>(mapper, getResponseHandler(JsonNodeIndex.class),
                 javaType, (handlerResult, convertResult) -> {
             logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
@@ -53,8 +54,8 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         }), callback);
     }
 
-    protected final <T> Future<List<T>> executeObject(final ClassicHttpRequest request, final Class<T> responseClass,
-                                                      final StreamFutureCallback<T> callback) throws IOException {
+    protected final <T> Future<Void> executeObject(final ClassicHttpRequest request, final Class<T> responseClass,
+                                                   final StreamFutureCallback<T> callback) throws IOException {
         return execute(request, mapper.getTypeFactory().constructType(responseClass), callback);
     }
 }

@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -135,13 +136,10 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     void stream() throws Throwable {
         useApi((s, c) -> {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
-            final List<Model> array = c.stream(callback).get();
-            callback.assertResult(array);
-            assertEquals(array, callback.results);
-            assertNotNull(array);
-            assertEquals(2, array.size());
+            assertNull(c.stream(callback).get());
+            assertEquals(2, callback.results.size());
 
-            final Model model = array.get(1);
+            final Model model = callback.results.get(1);
             assertEquals(101, model.getIntValue());
             assertEquals("stringValue2", model.getStringValue());
             assertFalse(model.isBooleanValue());
@@ -154,11 +152,8 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     void streamNull() throws Throwable {
         useApi((s, c) -> {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
-            final List<Model> array = c.stream(callback).get();
-            callback.assertResult(array);
-            assertEquals(array, callback.results);
-            assertNotNull(array);
-            assertEquals(0, array.size());
+            assertNull(c.stream(callback).get());
+            assertEquals(0, callback.results.size());
         }, s -> s.enqueue(new MockResponse().setBody(" \n ")));
     }
 
@@ -196,7 +191,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             return executeArray(get("/ping.html").build(), Model.class, callback);
         }
 
-        public Future<List<Model>> stream(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
+        public Future<Void> stream(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
             return executeObject(get("/ping.html").build(), Model.class, callback);
         }
     }
@@ -260,7 +255,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         }
     }
 
-    private static class MyStreamFutureCallback<T> extends MyFutureCallback<List<T>>
+    private static class MyStreamFutureCallback<T> extends MyFutureCallback<Void>
             implements StreamFutureCallback<T> {
         private final List<T> results = new ArrayList<>();
 
