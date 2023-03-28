@@ -1,41 +1,44 @@
 package io.github.dbstarll.utils.json.jackson;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.dbstarll.utils.json.JsonParseException;
 import io.github.dbstarll.utils.net.api.index.Index;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import io.github.dbstarll.utils.net.api.index.IndexBaseHttpClientResponseHandler;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
 
-final class StreamJavaTypeResponseHandler<H extends Index<H1>, H1, T>
-        implements HttpClientResponseHandler<JavaTypeIndex<T>> {
+final class StreamJavaTypeResponseHandler<T> extends IndexBaseHttpClientResponseHandler<Index<T>> {
     private final ObjectMapper mapper;
-    private final HttpClientResponseHandler<H> responseHandler;
     private final JavaType javaType;
-    private final BiConsumer<H1, T> consumer;
+    private final BiConsumer<String, T> consumer;
 
-    StreamJavaTypeResponseHandler(final ObjectMapper mapper, final HttpClientResponseHandler<H> responseHandler,
-                                  final JavaType javaType, final BiConsumer<H1, T> consumer) {
+    StreamJavaTypeResponseHandler(final ObjectMapper mapper, final JavaType javaType,
+                                  final BiConsumer<String, T> consumer) {
         this.mapper = mapper;
-        this.responseHandler = responseHandler;
         this.javaType = javaType;
         this.consumer = consumer;
     }
 
     @Override
-    public JavaTypeIndex<T> handleResponse(final ClassicHttpResponse response) throws HttpException, IOException {
-        final H handlerResult = responseHandler.handleResponse(response);
-        if (handlerResult == null) {
-            return null;
-        } else if (handlerResult.getData() == null) {
-            return new JavaTypeIndex<>(null, handlerResult.getIndex());
-        } else {
-            final T convertResult = mapper.convertValue(handlerResult.getData(), javaType);
-            consumer.accept(handlerResult.getData(), convertResult);
-            return new JavaTypeIndex<>(convertResult, handlerResult.getIndex());
+    protected Index<T> handleContent(final String content, final boolean endOfStream) throws IOException {
+        if (StringUtils.isBlank(content)) {
+            return new JavaTypeIndex<>(null, -1);
+        }
+        try (JsonParser parser = mapper.createParser(content)) {
+            final T data = mapper.readValue(parser, javaType);
+            final int index = (int) parser.currentLocation().getCharOffset();
+            consumer.accept(content.substring(0, index), data);
+            return new JavaTypeIndex<>(data, index);
+        } catch (Exception e) {
+            if (endOfStream) {
+                throw new JsonParseException(e);
+            } else {
+                return null;
+            }
         }
     }
 }

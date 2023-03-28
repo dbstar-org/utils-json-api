@@ -150,10 +150,19 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     }
 
     @Test
-    void streamNull() throws Throwable {
+    void streamModelNull() throws Throwable {
         useApi((s, c) -> {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
             assertNull(c.streamModel(callback).get());
+            assertEquals(0, callback.results.size());
+        }, s -> s.enqueue(new MockResponse().setBody(" \n ")));
+    }
+
+    @Test
+    void streamNull() throws Throwable {
+        useApi((s, c) -> {
+            final MyStreamFutureCallback<JsonNode> callback = new MyStreamFutureCallback<>();
+            assertNull(c.stream(callback).get());
             assertEquals(0, callback.results.size());
         }, s -> s.enqueue(new MockResponse().setBody(" \n ")));
     }

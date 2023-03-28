@@ -56,12 +56,12 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
                                              final StreamFutureCallback<T> callback) throws IOException {
-        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, getResponseHandler(JsonNodeIndex.class),
-                javaType, (handlerResult, convertResult) -> {
-            logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
-                    handlerResult.getClass().getName(), handlerResult);
-            logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
-        }), callback);
+        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, javaType,
+                (handlerResult, convertResult) -> {
+                    logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
+                            handlerResult.getClass().getName(), handlerResult);
+                    logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
+                }), callback);
     }
 
     @Override
