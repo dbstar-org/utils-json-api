@@ -28,7 +28,9 @@ final class StreamJavaTypeResponseHandler<H extends Index<H1>, H1, T>
     @Override
     public JavaTypeIndex<T> handleResponse(final ClassicHttpResponse response) throws HttpException, IOException {
         final H handlerResult = responseHandler.handleResponse(response);
-        if (handlerResult.getData() == null) {
+        if (handlerResult == null) {
+            return null;
+        } else if (handlerResult.getData() == null) {
             return new JavaTypeIndex<>(null, handlerResult.getIndex());
         } else {
             final T convertResult = mapper.convertValue(handlerResult.getData(), javaType);

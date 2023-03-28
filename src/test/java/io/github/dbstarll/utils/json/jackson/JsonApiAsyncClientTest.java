@@ -1,6 +1,7 @@
 package io.github.dbstarll.utils.json.jackson;
 
 import com.fasterxml.jackson.core.io.JsonEOFException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -136,7 +137,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     void stream() throws Throwable {
         useApi((s, c) -> {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
-            assertNull(c.stream(callback).get());
+            assertNull(c.streamModel(callback).get());
             assertEquals(2, callback.results.size());
 
             final Model model = callback.results.get(1);
@@ -152,7 +153,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     void streamNull() throws Throwable {
         useApi((s, c) -> {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
-            assertNull(c.stream(callback).get());
+            assertNull(c.streamModel(callback).get());
             assertEquals(0, callback.results.size());
         }, s -> s.enqueue(new MockResponse().setBody(" \n ")));
     }
@@ -161,6 +162,28 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     void streamException() throws Throwable {
         useApi((s, c) -> {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
+            final ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> c.streamModel(callback).get());
+            assertNotNull(e.getCause());
+            assertSame(JsonParseException.class, e.getCause().getClass());
+            assertNotNull(e.getCause().getCause());
+            assertSame(JsonEOFException.class, e.getCause().getCause().getClass());
+        }, s -> s.enqueue(new MockResponse().setBody("{")));
+    }
+
+    @Test
+    void streamNode() throws Throwable {
+        useApi((s, c) -> {
+            final MyStreamFutureCallback<JsonNode> callback = new MyStreamFutureCallback<>();
+            assertNull(c.stream(callback).get());
+            assertEquals(1, callback.results.size());
+            assertEquals("{}", callback.results.get(0).toString());
+        }, s -> s.enqueue(new MockResponse().setBody("{}")));
+    }
+
+    @Test
+    void streamNodeException() throws Throwable {
+        useApi((s, c) -> {
+            final MyStreamFutureCallback<JsonNode> callback = new MyStreamFutureCallback<>();
             final ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> c.stream(callback).get());
             assertNotNull(e.getCause());
             assertSame(JsonParseException.class, e.getCause().getClass());
@@ -180,7 +203,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         }
 
         public Future<Model> model(final FutureCallback<Model> callback) throws ApiException, IOException {
-            return executeObject(get("/ping.html").build(), Model.class, callback);
+            return execute(get("/ping.html").build(), Model.class, callback);
         }
 
         public Future<ArrayNode> array(final FutureCallback<ArrayNode> callback) throws ApiException, IOException {
@@ -191,8 +214,12 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             return executeArray(get("/ping.html").build(), Model.class, callback);
         }
 
-        public Future<Void> stream(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
-            return executeObject(get("/ping.html").build(), Model.class, callback);
+        public Future<Void> streamModel(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
+            return execute(get("/ping.html").build(), Model.class, callback);
+        }
+
+        public Future<Void> stream(final StreamFutureCallback<JsonNode> callback) throws ApiException, IOException {
+            return execute(get("/ping.html").build(), JsonNode.class, callback);
         }
     }
 

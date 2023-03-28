@@ -125,7 +125,7 @@ class JsonApiClientTest extends JsonApiClientTestCase {
         }
 
         public Model model() throws ApiException, IOException {
-            return executeObject(get("/ping.html").build(), Model.class);
+            return execute(get("/ping.html").build(), Model.class);
         }
 
         public ArrayNode array() throws ApiException, IOException {

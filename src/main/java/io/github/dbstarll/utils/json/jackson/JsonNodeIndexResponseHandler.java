@@ -19,7 +19,11 @@ class JsonNodeIndexResponseHandler extends IndexBaseHttpClientResponseHandler<Js
         try (JsonParser parser = mapper.createParser(content)) {
             return new JsonNodeIndex(mapper.readTree(parser), (int) parser.currentLocation().getCharOffset());
         } catch (Exception e) {
-            throw new JsonParseException(e);
+            if (endOfStream) {
+                throw new JsonParseException(e);
+            } else {
+                return null;
+            }
         }
     }
 }
