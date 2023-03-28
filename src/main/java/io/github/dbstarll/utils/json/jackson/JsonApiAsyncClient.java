@@ -1,7 +1,6 @@
 package io.github.dbstarll.utils.json.jackson;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dbstarll.utils.net.api.ApiAsyncClient;
 import io.github.dbstarll.utils.net.api.StreamFutureCallback;
@@ -30,7 +29,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<T> execute(final ClassicHttpRequest request, final JavaType javaType,
                                           final FutureCallback<T> callback) throws IOException {
-        return execute(request, new JavaTypeResponseHandler<>(mapper, getResponseHandler(JsonNode.class), javaType,
+        return execute(request, new JavaTypeResponseHandler<>(mapper, getResponseHandler(String.class), javaType,
                 (handlerResult, convertResult) -> {
                     logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
                             handlerResult.getClass().getName(), handlerResult);

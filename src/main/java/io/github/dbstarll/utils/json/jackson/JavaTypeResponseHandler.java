@@ -9,14 +9,14 @@ import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import java.io.IOException;
 import java.util.function.BiConsumer;
 
-final class JavaTypeResponseHandler<H, T> implements HttpClientResponseHandler<T> {
+final class JavaTypeResponseHandler<T> implements HttpClientResponseHandler<T> {
     private final ObjectMapper mapper;
-    private final HttpClientResponseHandler<H> responseHandler;
+    private final HttpClientResponseHandler<String> responseHandler;
     private final JavaType javaType;
-    private final BiConsumer<H, T> consumer;
+    private final BiConsumer<String, T> consumer;
 
-    JavaTypeResponseHandler(final ObjectMapper mapper, final HttpClientResponseHandler<H> responseHandler,
-                            final JavaType javaType, final BiConsumer<H, T> consumer) {
+    JavaTypeResponseHandler(final ObjectMapper mapper, final HttpClientResponseHandler<String> responseHandler,
+                            final JavaType javaType, final BiConsumer<String, T> consumer) {
         this.mapper = mapper;
         this.responseHandler = responseHandler;
         this.javaType = javaType;
@@ -25,8 +25,8 @@ final class JavaTypeResponseHandler<H, T> implements HttpClientResponseHandler<T
 
     @Override
     public T handleResponse(final ClassicHttpResponse response) throws HttpException, IOException {
-        final H handlerResult = responseHandler.handleResponse(response);
-        final T convertResult = mapper.convertValue(handlerResult, javaType);
+        final String handlerResult = responseHandler.handleResponse(response);
+        final T convertResult = mapper.readValue(handlerResult, javaType);
         consumer.accept(handlerResult, convertResult);
         return convertResult;
     }
