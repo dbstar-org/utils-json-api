@@ -14,10 +14,12 @@ import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
 public abstract class JsonApiAsyncClient extends ApiAsyncClient {
+    private static final String RESPONSE_CLASS_IS_NULL_EX_MESSAGE = "responseClass is null";
     protected final ObjectMapper mapper;
 
     protected JsonApiAsyncClient(final HttpAsyncClient httpClient, final boolean alwaysProcessEntity,
@@ -28,20 +30,24 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         setResponseHandlerFactory(new JsonIndexResponseHandlerFactory(mapper));
     }
 
+    private <H, C> BiConsumer<H, C> logConvert(final ClassicHttpRequest request, final JavaType javaType) {
+        return (handlerResult, convertResult) -> {
+            logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
+                    handlerResult.getClass().getName(), handlerResult);
+            logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
+        };
+    }
+
     protected final <T> Future<T> execute(final ClassicHttpRequest request, final JavaType javaType,
                                           final FutureCallback<T> callback) throws IOException {
         return execute(request, new JavaTypeResponseHandler<>(mapper, getResponseHandler(String.class), javaType,
-                (handlerResult, convertResult) -> {
-                    logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
-                            handlerResult.getClass().getName(), handlerResult);
-                    logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
-                }), callback);
+                logConvert(request, javaType)), callback);
     }
 
     @Override
     protected final <T> Future<T> execute(final ClassicHttpRequest request, final Class<T> responseClass,
                                           final FutureCallback<T> callback) throws IOException {
-        notNull(responseClass, "responseClass is null");
+        notNull(responseClass, RESPONSE_CLASS_IS_NULL_EX_MESSAGE);
         final HttpClientResponseHandler<T> responseHandler = getResponseHandler(responseClass);
         if (responseHandler != null) {
             return execute(request, responseHandler, callback);
@@ -57,18 +63,14 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
                                              final StreamFutureCallback<T> callback) throws IOException {
-        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, javaType,
-                (handlerResult, convertResult) -> {
-                    logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
-                            handlerResult.getClass().getName(), handlerResult);
-                    logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
-                }), callback);
+        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, javaType, logConvert(request, javaType)),
+                callback);
     }
 
     @Override
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final Class<T> responseClass,
                                              final StreamFutureCallback<T> callback) throws IOException {
-        notNull(responseClass, "responseClass is null");
+        notNull(responseClass, RESPONSE_CLASS_IS_NULL_EX_MESSAGE);
         final Class<? extends Index<T>> streamResponseClass = getStreamResponseClass(responseClass);
         if (streamResponseClass != null) {
             return execute(request, getResponseHandler(streamResponseClass), callback);
@@ -89,16 +91,12 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
     protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request, final JavaType javaType,
                                                   final StreamFutureCallback<T> callback) throws IOException {
         return executeEvent(request, new JavaTypeResponseHandler<>(mapper, getResponseHandler(String.class), javaType,
-                (handlerResult, convertResult) -> {
-                    logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
-                            handlerResult.getClass().getName(), handlerResult);
-                    logger.trace("convert: [{}]@{} with {}:{}", request, request.hashCode(), javaType, convertResult);
-                }), callback);
+                logConvert(request, javaType)), callback);
     }
 
     protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request, final Class<T> responseClass,
                                                   final StreamFutureCallback<T> callback) throws IOException {
-        notNull(responseClass, "responseClass is null");
+        notNull(responseClass, RESPONSE_CLASS_IS_NULL_EX_MESSAGE);
         final HttpClientResponseHandler<T> responseHandler = getResponseHandler(responseClass);
         if (responseHandler != null) {
             return executeEvent(request, getResponseHandler(responseClass), callback);
