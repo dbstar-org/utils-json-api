@@ -2,7 +2,6 @@ package io.github.dbstarll.utils.json.jackson;
 
 import io.github.dbstarll.utils.net.api.index.AbstractIndex;
 import io.github.dbstarll.utils.net.api.index.EventStream;
-import io.github.dbstarll.utils.net.api.index.EventStreamIndex;
 import io.github.dbstarll.utils.net.api.index.Index;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -13,19 +12,19 @@ import org.apache.hc.core5.http.io.support.ClassicResponseBuilder;
 
 import java.io.IOException;
 
-final class EventStreamResponseHandler<T> implements HttpClientResponseHandler<Index<T>> {
-    private final HttpClientResponseHandler<EventStreamIndex> from;
+final class EventStreamConvertResponseHandler<T> implements HttpClientResponseHandler<Index<T>> {
+    private final HttpClientResponseHandler<? extends Index<EventStream>> original;
     private final HttpClientResponseHandler<T> target;
 
-    EventStreamResponseHandler(final HttpClientResponseHandler<EventStreamIndex> from,
-                               final HttpClientResponseHandler<T> target) {
-        this.from = from;
+    EventStreamConvertResponseHandler(final HttpClientResponseHandler<? extends Index<EventStream>> original,
+                                      final HttpClientResponseHandler<T> target) {
+        this.original = original;
         this.target = target;
     }
 
     @Override
     public Index<T> handleResponse(final ClassicHttpResponse response) throws HttpException, IOException {
-        final EventStreamIndex eventStreamIndex = from.handleResponse(response);
+        final Index<EventStream> eventStreamIndex = original.handleResponse(response);
         if (eventStreamIndex == null) {
             return null;
         }

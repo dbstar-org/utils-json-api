@@ -30,7 +30,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         setResponseHandlerFactory(new JsonIndexResponseHandlerFactory(mapper));
     }
 
-    private <H, C> BiConsumer<H, C> logConvert(final ClassicHttpRequest request, final JavaType javaType) {
+    private <H, C> BiConsumer<H, C> convert(final ClassicHttpRequest request, final JavaType javaType) {
         return (handlerResult, convertResult) -> {
             logger.trace("handler: [{}]@{} with {}:[{}]", request, request.hashCode(),
                     handlerResult.getClass().getName(), handlerResult);
@@ -40,8 +40,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<T> execute(final ClassicHttpRequest request, final JavaType javaType,
                                           final FutureCallback<T> callback) throws IOException {
-        return execute(request, new JavaTypeResponseHandler<>(mapper, getResponseHandler(String.class), javaType,
-                logConvert(request, javaType)), callback);
+        return execute(request, new JavaTypeResponseHandler<>(mapper, javaType, convert(request, javaType)), callback);
     }
 
     @Override
@@ -63,7 +62,7 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
                                              final StreamFutureCallback<T> callback) throws IOException {
-        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, javaType, logConvert(request, javaType)),
+        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, javaType, convert(request, javaType)),
                 callback);
     }
 
@@ -84,14 +83,14 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
                                                   final StreamFutureCallback<T> callback) throws IOException {
         notNull(responseHandler, "responseHandler is null");
         notNull(callback, "callback is null");
-        return execute(request, new EventStreamResponseHandler<>(getResponseHandler(EventStreamIndex.class),
+        return execute(request, new EventStreamConvertResponseHandler<>(getResponseHandler(EventStreamIndex.class),
                 responseHandler), callback);
     }
 
     protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request, final JavaType javaType,
                                                   final StreamFutureCallback<T> callback) throws IOException {
-        return executeEvent(request, new JavaTypeResponseHandler<>(mapper, getResponseHandler(String.class), javaType,
-                logConvert(request, javaType)), callback);
+        return executeEvent(request, new JavaTypeResponseHandler<>(mapper, javaType, convert(request, javaType)),
+                callback);
     }
 
     protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request, final Class<T> responseClass,
