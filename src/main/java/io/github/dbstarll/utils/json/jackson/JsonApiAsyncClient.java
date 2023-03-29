@@ -78,29 +78,29 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         }
     }
 
-    protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request,
-                                                  final HttpClientResponseHandler<T> responseHandler,
-                                                  final StreamFutureCallback<T> callback) throws IOException {
+    protected final <T> Future<Void> execute(final ClassicHttpRequest request,
+                                             final HttpClientResponseHandler<T> responseHandler,
+                                             final EventStreamFutureCallback<T> callback) throws IOException {
         notNull(responseHandler, "responseHandler is null");
         notNull(callback, "callback is null");
         return execute(request, new EventStreamConvertResponseHandler<>(getResponseHandler(EventStreamIndex.class),
-                responseHandler), callback);
+                responseHandler, callback::ignore), callback);
     }
 
-    protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request, final JavaType javaType,
-                                                  final StreamFutureCallback<T> callback) throws IOException {
-        return executeEvent(request, new JavaTypeResponseHandler<>(mapper, javaType, convert(request, javaType)),
+    protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
+                                             final EventStreamFutureCallback<T> callback) throws IOException {
+        return execute(request, new JavaTypeResponseHandler<T>(mapper, javaType, convert(request, javaType)),
                 callback);
     }
 
-    protected final <T> Future<Void> executeEvent(final ClassicHttpRequest request, final Class<T> responseClass,
-                                                  final StreamFutureCallback<T> callback) throws IOException {
+    protected final <T> Future<Void> execute(final ClassicHttpRequest request, final Class<T> responseClass,
+                                             final EventStreamFutureCallback<T> callback) throws IOException {
         notNull(responseClass, RESPONSE_CLASS_IS_NULL_EX_MESSAGE);
         final HttpClientResponseHandler<T> responseHandler = getResponseHandler(responseClass);
         if (responseHandler != null) {
-            return executeEvent(request, getResponseHandler(responseClass), callback);
+            return execute(request, getResponseHandler(responseClass), callback);
         } else {
-            return executeEvent(request, mapper.getTypeFactory().constructType(responseClass), callback);
+            return execute(request, mapper.getTypeFactory().constructType(responseClass), callback);
         }
     }
 }

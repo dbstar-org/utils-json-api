@@ -12,6 +12,7 @@ import io.github.dbstarll.utils.json.ThrowingBiConsumer;
 import io.github.dbstarll.utils.json.test.Model;
 import io.github.dbstarll.utils.net.api.ApiException;
 import io.github.dbstarll.utils.net.api.StreamFutureCallback;
+import io.github.dbstarll.utils.net.api.index.EventStream;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
@@ -204,18 +205,18 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     @Test
     void streamEvent() throws Throwable {
         useApi((s, c) -> {
-            final MyStreamFutureCallback<JsonNode> callback = new MyStreamFutureCallback<>();
+            final MyIgnoreEventStreamFutureCallback<JsonNode> callback = new MyIgnoreEventStreamFutureCallback<>();
             assertNull(c.event(callback).get());
             assertEquals(2, callback.results.size());
             assertEquals("{}", callback.results.get(0).toString());
             assertEquals("[]", callback.results.get(1).toString());
-        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\n  \n\n")));
+        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\ndata: ignore\n\n  \n\n")));
     }
 
     @Test
     void streamEventModel() throws Throwable {
         useApi((s, c) -> {
-            final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
+            final MyEventStreamFutureCallback<Model> callback = new MyEventStreamFutureCallback<>();
             assertNull(c.eventModel(callback).get());
             assertEquals(1, callback.results.size());
             final Model model = callback.results.get(0);
@@ -257,12 +258,12 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             return execute(get("/ping.html").build(), JsonNode.class, callback);
         }
 
-        public Future<Void> event(final StreamFutureCallback<JsonNode> callback) throws ApiException, IOException {
-            return executeEvent(get("/ping.html").build(), JsonNode.class, callback);
+        public Future<Void> event(final EventStreamFutureCallback<JsonNode> callback) throws ApiException, IOException {
+            return execute(get("/ping.html").build(), JsonNode.class, callback);
         }
 
-        public Future<Void> eventModel(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
-            return executeEvent(get("/ping.html").build(), Model.class, callback);
+        public Future<Void> eventModel(final EventStreamFutureCallback<Model> callback) throws ApiException, IOException {
+            return execute(get("/ping.html").build(), Model.class, callback);
         }
     }
 
@@ -327,11 +328,23 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
 
     private static class MyStreamFutureCallback<T> extends MyFutureCallback<Void>
             implements StreamFutureCallback<T> {
-        private final List<T> results = new ArrayList<>();
+        protected final List<T> results = new ArrayList<>();
 
         @Override
         public void stream(T result) {
             results.add(result);
         }
+    }
+
+    private static class MyIgnoreEventStreamFutureCallback<T> extends MyStreamFutureCallback<T>
+            implements EventStreamFutureCallback<T> {
+        @Override
+        public boolean ignore(EventStream eventStream) {
+            return "ignore".equals(eventStream.getData());
+        }
+    }
+
+    private static class MyEventStreamFutureCallback<T> extends MyStreamFutureCallback<T>
+            implements EventStreamFutureCallback<T> {
     }
 }
