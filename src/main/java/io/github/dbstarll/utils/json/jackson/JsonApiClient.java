@@ -7,9 +7,12 @@ import io.github.dbstarll.utils.net.api.ApiClient;
 import io.github.dbstarll.utils.net.api.ApiException;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.apache.commons.lang3.Validate.notNull;
 
 public abstract class JsonApiClient extends ApiClient {
     protected final ObjectMapper mapper;
@@ -28,9 +31,16 @@ public abstract class JsonApiClient extends ApiClient {
         return convertResult;
     }
 
-    protected final <T> T executeObject(final ClassicHttpRequest request, final Class<T> responseClass)
+    @Override
+    protected final <T> T execute(final ClassicHttpRequest request, final Class<T> responseClass)
             throws IOException, ApiException {
-        return execute(request, mapper.getTypeFactory().constructType(responseClass));
+        notNull(responseClass, "responseClass is null");
+        final HttpClientResponseHandler<T> responseHandler = getResponseHandler(responseClass);
+        if (responseHandler != null) {
+            return execute(request, responseHandler);
+        } else {
+            return execute(request, mapper.getTypeFactory().constructType(responseClass));
+        }
     }
 
     protected final <T> List<T> executeArray(final ClassicHttpRequest request, final Class<T> responseClass)
