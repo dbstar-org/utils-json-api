@@ -11,15 +11,18 @@ import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.support.ClassicResponseBuilder;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 
 final class EventStreamConvertResponseHandler<T> implements HttpClientResponseHandler<Index<T>> {
     private final HttpClientResponseHandler<? extends Index<EventStream>> original;
     private final HttpClientResponseHandler<T> target;
+    private final Predicate<EventStream> ignore;
 
     EventStreamConvertResponseHandler(final HttpClientResponseHandler<? extends Index<EventStream>> original,
-                                      final HttpClientResponseHandler<T> target) {
+                                      final HttpClientResponseHandler<T> target, final Predicate<EventStream> ignore) {
         this.original = original;
         this.target = target;
+        this.ignore = ignore;
     }
 
     @Override
@@ -30,8 +33,8 @@ final class EventStreamConvertResponseHandler<T> implements HttpClientResponseHa
         }
 
         final EventStream eventStream = eventStreamIndex.getData();
-        final T data = eventStream == null || StringUtils.isBlank(eventStream.getData()) ? null
-                : handleResponse(response, eventStream.getData());
+        final T data = eventStream == null || StringUtils.isBlank(eventStream.getData()) || ignore.test(eventStream)
+                ? null : handleResponse(response, eventStream.getData());
         return new AbstractIndex<T>(data, eventStreamIndex.getIndex()) {
         };
     }
