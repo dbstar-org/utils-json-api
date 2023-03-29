@@ -201,6 +201,32 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         }, s -> s.enqueue(new MockResponse().setBody("{")));
     }
 
+    @Test
+    void streamEvent() throws Throwable {
+        useApi((s, c) -> {
+            final MyStreamFutureCallback<JsonNode> callback = new MyStreamFutureCallback<>();
+            assertNull(c.event(callback).get());
+            assertEquals(2, callback.results.size());
+            assertEquals("{}", callback.results.get(0).toString());
+            assertEquals("[]", callback.results.get(1).toString());
+        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\n  \n\n")));
+    }
+
+    @Test
+    void streamEventModel() throws Throwable {
+        useApi((s, c) -> {
+            final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
+            assertNull(c.eventModel(callback).get());
+            assertEquals(1, callback.results.size());
+            final Model model = callback.results.get(0);
+            assertEquals(100, model.getIntValue());
+            assertEquals("stringValue1", model.getStringValue());
+            assertTrue(model.isBooleanValue());
+            assertEquals(3.14, model.getFloatValue(), 0.0001);
+            assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
+        }, s -> s.enqueue(new MockResponse().setBody("data: " + jsonObject)));
+    }
+
     private static class MyApiClient extends JsonApiAsyncClient {
         public MyApiClient(final HttpAsyncClient httpClient, final String uriBase, final ObjectMapper mapper) {
             super(httpClient, true, mapper);
@@ -229,6 +255,14 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
 
         public Future<Void> stream(final StreamFutureCallback<JsonNode> callback) throws ApiException, IOException {
             return execute(get("/ping.html").build(), JsonNode.class, callback);
+        }
+
+        public Future<Void> event(final StreamFutureCallback<JsonNode> callback) throws ApiException, IOException {
+            return executeEvent(get("/ping.html").build(), JsonNode.class, callback);
+        }
+
+        public Future<Void> eventModel(final StreamFutureCallback<Model> callback) throws ApiException, IOException {
+            return executeEvent(get("/ping.html").build(), Model.class, callback);
         }
     }
 
