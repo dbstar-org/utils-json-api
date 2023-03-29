@@ -8,6 +8,7 @@ import io.github.dbstarll.utils.net.api.index.AbstractIndex;
 import io.github.dbstarll.utils.net.api.index.Index;
 import io.github.dbstarll.utils.net.api.index.IndexBaseHttpClientResponseHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
@@ -17,8 +18,10 @@ final class StreamJavaTypeResponseHandler<T> extends IndexBaseHttpClientResponse
     private final JavaType javaType;
     private final BiConsumer<String, T> consumer;
 
-    StreamJavaTypeResponseHandler(final ObjectMapper mapper, final JavaType javaType,
+    StreamJavaTypeResponseHandler(final HttpClientResponseHandler<String> stringResponseHandler,
+                                  final ObjectMapper mapper, final JavaType javaType,
                                   final BiConsumer<String, T> consumer) {
+        super(stringResponseHandler);
         this.mapper = mapper;
         this.javaType = javaType;
         this.consumer = consumer;
