@@ -5,13 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dbstarll.utils.json.JsonParseException;
 import io.github.dbstarll.utils.net.api.index.IndexBaseHttpClientResponseHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
 
 class JsonNodeIndexResponseHandler extends IndexBaseHttpClientResponseHandler<JsonNodeIndex> {
     private final ObjectMapper mapper;
 
-    JsonNodeIndexResponseHandler(final ObjectMapper mapper) {
+    JsonNodeIndexResponseHandler(final HttpClientResponseHandler<String> stringResponseHandler,
+                                 final ObjectMapper mapper) {
+        super(stringResponseHandler);
         this.mapper = mapper;
     }
 

@@ -18,7 +18,7 @@ public abstract class JsonApiClient extends ApiClient {
     protected final ObjectMapper mapper;
 
     protected JsonApiClient(final HttpClient httpClient, final boolean alwaysProcessEntity, final ObjectMapper mapper) {
-        super(httpClient);
+        super(httpClient, alwaysProcessEntity);
         this.mapper = mapper;
         setResponseHandlerFactory(new JsonResponseHandlerFactory(mapper, alwaysProcessEntity));
     }

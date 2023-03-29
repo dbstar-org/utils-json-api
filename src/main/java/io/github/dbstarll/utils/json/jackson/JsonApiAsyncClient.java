@@ -24,10 +24,10 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected JsonApiAsyncClient(final HttpAsyncClient httpClient, final boolean alwaysProcessEntity,
                                  final ObjectMapper mapper) {
-        super(httpClient);
+        super(httpClient, alwaysProcessEntity);
         this.mapper = mapper;
         setResponseHandlerFactory(new JsonResponseHandlerFactory(mapper, alwaysProcessEntity));
-        setResponseHandlerFactory(new JsonIndexResponseHandlerFactory(mapper));
+        setResponseHandlerFactory(new JsonIndexResponseHandlerFactory(getResponseHandler(String.class), mapper));
     }
 
     private <H, C> BiConsumer<H, C> convert(final ClassicHttpRequest request, final JavaType javaType) {
@@ -40,7 +40,8 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<T> execute(final ClassicHttpRequest request, final JavaType javaType,
                                           final FutureCallback<T> callback) throws IOException {
-        return execute(request, new JavaTypeResponseHandler<>(mapper, javaType, convert(request, javaType)), callback);
+        return execute(request, new JavaTypeResponseHandler<>(getResponseHandler(String.class), mapper, javaType,
+                convert(request, javaType)), callback);
     }
 
     @Override
@@ -62,8 +63,8 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
                                              final StreamFutureCallback<T> callback) throws IOException {
-        return execute(request, new StreamJavaTypeResponseHandler<>(mapper, javaType, convert(request, javaType)),
-                callback);
+        return execute(request, new StreamJavaTypeResponseHandler<>(getResponseHandler(String.class), mapper, javaType,
+                convert(request, javaType)), callback);
     }
 
     @Override
@@ -89,8 +90,8 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
 
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final JavaType javaType,
                                              final EventStreamFutureCallback<T> callback) throws IOException {
-        return execute(request, new JavaTypeResponseHandler<T>(mapper, javaType, convert(request, javaType)),
-                callback);
+        return execute(request, new JavaTypeResponseHandler<T>(getResponseHandler(String.class), mapper, javaType,
+                convert(request, javaType)), callback);
     }
 
     protected final <T> Future<Void> execute(final ClassicHttpRequest request, final Class<T> responseClass,
