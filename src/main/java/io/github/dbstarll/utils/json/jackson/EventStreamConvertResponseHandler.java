@@ -52,10 +52,6 @@ final class EventStreamConvertResponseHandler<T> implements HttpClientResponseHa
     }
 
     private HttpEntity buildEntity(final ClassicHttpResponse response, final String content) {
-        final ContentType contentType = ContentType.parse(response.getEntity().getContentType());
-        if (contentType != null) {
-            return new StringEntity(content, contentType);
-        }
-        return new StringEntity(content);
+        return new StringEntity(content, ContentType.parse(response.getEntity().getContentType()));
     }
 }
