@@ -5,9 +5,14 @@ import io.github.dbstarll.utils.net.api.index.EventStream;
 import io.github.dbstarll.utils.net.api.index.Index;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.io.support.ClassicResponseBuilder;
 
 import java.io.IOException;
@@ -43,8 +48,19 @@ final class EventStreamConvertResponseHandler<T> implements HttpClientResponseHa
         final ClassicHttpResponse classicHttpResponse = ClassicResponseBuilder.create(response.getCode())
                 .setVersion(response.getVersion())
                 .setHeaders(response.getHeaders())
-                .setEntity(content)
+                .setEntity(buildEntity(response, content))
                 .build();
         return target.handleResponse(classicHttpResponse);
+    }
+
+    private HttpEntity buildEntity(final HttpResponse response, final String content) {
+        final Header h = response.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+        if (h != null) {
+            final ContentType contentType = ContentType.parse(h.getValue());
+            if (contentType != null) {
+                return new StringEntity(content, ContentType.parse(h.getValue()));
+            }
+        }
+        return new StringEntity(content);
     }
 }

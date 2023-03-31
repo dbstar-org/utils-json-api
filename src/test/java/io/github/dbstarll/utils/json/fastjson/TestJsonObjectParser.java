@@ -17,7 +17,7 @@ class TestJsonObjectParser {
 
     @BeforeEach
     void setUp() {
-        this.model1 = new Model(100, "stringValue1", true, 3.14f, new int[]{1, 2, 3, 4, 5});
+        this.model1 = new Model(100, "中文", true, 3.14f, new int[]{1, 2, 3, 4, 5});
         this.jsonObject = JSON.toJSONString(model1);
     }
 
@@ -33,7 +33,7 @@ class TestJsonObjectParser {
         assertNotNull(json);
         assertEquals(5, json.size());
         assertEquals(100, json.getIntValue("intValue"));
-        assertEquals("stringValue1", json.getString("stringValue"));
+        assertEquals("中文", json.getString("stringValue"));
         assertTrue(json.getBooleanValue("booleanValue"));
         assertEquals(3.14f, json.getFloatValue("floatValue"));
         assertEquals("[1,2,3,4,5]", json.getJSONArray("intArray").toString());

@@ -11,6 +11,8 @@ import io.github.dbstarll.utils.net.api.ApiException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,11 +62,11 @@ class JsonApiClientTest extends JsonApiClientTestCase {
             assertNotNull(json);
             assertEquals(5, json.size());
             assertEquals(100, json.get("intValue").getAsInt());
-            assertEquals("stringValue1", json.get("stringValue").getAsString());
+            assertEquals("中文", json.get("stringValue").getAsString());
             assertTrue(json.get("booleanValue").getAsBoolean());
             assertEquals(3.14f, json.get("floatValue").getAsFloat());
             assertEquals("[1,2,3,4,5]", json.get("intArray").getAsJsonArray().toString());
-        }, s -> s.enqueue(new MockResponse().setBody(jsonObject)));
+        }, s -> s.enqueue(new MockResponse().setBody(jsonObject).setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
     }
 
     @Test

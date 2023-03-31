@@ -20,7 +20,7 @@ class TestJsonArrayParser {
 
     @BeforeEach
     void setUp() {
-        this.model1 = new Model(100, "stringValue1", true, 3.14f, new int[]{1, 2, 3, 4, 5});
+        this.model1 = new Model(100, "中文", true, 3.14f, new int[]{1, 2, 3, 4, 5});
         this.model2 = new Model(101, "stringValue2", false, 1.41f, new int[]{5, 4, 3, 2, 1});
         this.jsonArray = new JSONArray(Arrays.asList(model1, model2)).toString();
     }

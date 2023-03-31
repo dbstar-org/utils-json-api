@@ -17,12 +17,15 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
 import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,7 +78,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertNotNull(json);
             assertEquals(5, json.size());
             assertEquals(100, json.get("intValue").asInt());
-            assertEquals("stringValue1", json.get("stringValue").asText());
+            assertEquals("中文", json.get("stringValue").asText());
             assertTrue(json.get("booleanValue").asBoolean());
             assertEquals(3.14, json.get("floatValue").asDouble());
             assertEquals("[1,2,3,4,5]", json.get("intArray").toString());
@@ -90,7 +93,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             callback.assertResult(model);
             assertNotNull(model);
             assertEquals(100, model.getIntValue());
-            assertEquals("stringValue1", model.getStringValue());
+            assertEquals("中文", model.getStringValue());
             assertTrue(model.isBooleanValue());
             assertEquals(3.14, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
@@ -214,6 +217,33 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     }
 
     @Test
+    void streamEventBlankContentType() throws Throwable {
+        useApi((s, c) -> {
+            final MyIgnoreEventStreamFutureCallback<JsonNode> callback = new MyIgnoreEventStreamFutureCallback<>();
+            assertNull(c.event(callback).get());
+            assertEquals(2, callback.results.size());
+            assertEquals("{}", callback.results.get(0).toString());
+            assertEquals("[]", callback.results.get(1).toString());
+            //text/event-stream; charset=UTF-8
+        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\ndata: ignore\n\n  \n\n")
+                .setHeader(HttpHeaders.CONTENT_TYPE, "  ")));
+    }
+
+    @Test
+    void streamEventUnsupportedEncoding() throws Throwable {
+        useApi((s, c) -> {
+            final MyIgnoreEventStreamFutureCallback<JsonNode> callback = new MyIgnoreEventStreamFutureCallback<>();
+            final ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> c.event(callback).get());
+            e.printStackTrace();
+            assertNotNull(e.getCause());
+            assertSame(UnsupportedEncodingException.class, e.getCause().getClass());
+            assertEquals("UTF-88", e.getCause().getMessage());
+            callback.assertException(e.getCause());
+        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\ndata: ignore\n\n  \n\n")
+                .setHeader(HttpHeaders.CONTENT_TYPE, "text/event-stream; charset=UTF-88")));
+    }
+
+    @Test
     void streamEventModel() throws Throwable {
         useApi((s, c) -> {
             final MyEventStreamFutureCallback<Model> callback = new MyEventStreamFutureCallback<>();
@@ -221,11 +251,11 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertEquals(1, callback.results.size());
             final Model model = callback.results.get(0);
             assertEquals(100, model.getIntValue());
-            assertEquals("stringValue1", model.getStringValue());
+            assertEquals("中文", model.getStringValue());
             assertTrue(model.isBooleanValue());
             assertEquals(3.14, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
-        }, s -> s.enqueue(new MockResponse().setBody("data: " + jsonObject)));
+        }, s -> s.enqueue(new MockResponse().setBody("data: " + jsonObject).setHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_EVENT_STREAM)));
     }
 
     private static class MyApiClient extends JsonApiAsyncClient {

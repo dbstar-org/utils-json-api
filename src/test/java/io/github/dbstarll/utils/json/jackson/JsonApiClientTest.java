@@ -11,6 +11,8 @@ import io.github.dbstarll.utils.net.api.ApiException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,11 +63,11 @@ class JsonApiClientTest extends JsonApiClientTestCase {
             assertNotNull(json);
             assertEquals(5, json.size());
             assertEquals(100, json.get("intValue").asInt());
-            assertEquals("stringValue1", json.get("stringValue").asText());
+            assertEquals("中文", json.get("stringValue").asText());
             assertTrue(json.get("booleanValue").asBoolean());
             assertEquals(3.14, json.get("floatValue").asDouble());
             assertEquals("[1,2,3,4,5]", json.get("intArray").toString());
-        }, s -> s.enqueue(new MockResponse().setBody(jsonObject)));
+        }, s -> s.enqueue(new MockResponse().setBody(jsonObject).setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
     }
 
     @Test
@@ -74,11 +76,11 @@ class JsonApiClientTest extends JsonApiClientTestCase {
             final Model model = c.model();
             assertNotNull(model);
             assertEquals(100, model.getIntValue());
-            assertEquals("stringValue1", model.getStringValue());
+            assertEquals("中文", model.getStringValue());
             assertTrue(model.isBooleanValue());
             assertEquals(3.14, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
-        }, s -> s.enqueue(new MockResponse().setBody(jsonObject)));
+        }, s -> s.enqueue(new MockResponse().setBody(jsonObject).setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
     }
 
     @Test
