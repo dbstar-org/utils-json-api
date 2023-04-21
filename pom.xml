@@ -23,7 +23,7 @@
   <properties>
     <project.git.project>utils-json</project.git.project>
     <!-- utils -->
-    <version.utils-net-api>1.1.0-SNAPSHOT</version.utils-net-api>
+    <version.utils-net-api>1.1.0</version.utils-net-api>
     <!-- json impl -->
     <version.json>20220924</version.json>
     <version.fastjson2>2.0.24</version.fastjson2>
