@@ -10,6 +10,7 @@ import io.github.dbstarll.utils.json.test.Model;
 import io.github.dbstarll.utils.net.api.ApiException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,6 +86,24 @@ class JsonApiClientTest extends JsonApiClientTestCase {
     }
 
     @Test
+    void modelEntity() throws Throwable {
+        useApi((s, c) -> {
+            final Model model = c.model(new ModelParams("name"));
+            assertNotNull(model);
+            assertEquals(100, model.getIntValue());
+            assertEquals("中文", model.getStringValue());
+            assertTrue(model.isBooleanValue());
+            assertEquals(3.14, model.getFloatValue(), 0.0001);
+            assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
+
+            final RecordedRequest request = s.takeRequest();
+            assertEquals("POST", request.getMethod());
+            assertEquals(15, request.getBodySize());
+            assertEquals("{\"name\":\"name\"}", request.getBody().readUtf8());
+        }, s -> s.enqueue(new MockResponse().setBody(jsonObject).setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
+    }
+
+    @Test
     void array() throws Throwable {
         useApi((s, c) -> {
             final ArrayNode array = c.array();
@@ -130,12 +150,28 @@ class JsonApiClientTest extends JsonApiClientTestCase {
             return execute(get("/ping.html").build(), Model.class);
         }
 
+        public Model model(ModelParams params) throws ApiException, IOException {
+            return execute(post("/ping.html").setEntity(jsonEntity(params)).build(), Model.class);
+        }
+
         public ArrayNode array() throws ApiException, IOException {
             return execute(get("/ping.html").build(), ArrayNode.class);
         }
 
         public List<Model> models() throws ApiException, IOException {
             return executeArray(get("/ping.html").build(), Model.class);
+        }
+    }
+
+    private static class ModelParams implements Serializable {
+        private final String name;
+
+        private ModelParams(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }
