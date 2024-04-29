@@ -1,5 +1,6 @@
 package io.github.dbstarll.utils.json.jackson;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,11 +25,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JsonApiClientTest extends JsonApiClientTestCase {
     private ObjectMapper mapper;
@@ -147,7 +144,8 @@ class JsonApiClientTest extends JsonApiClientTestCase {
         }
 
         public Model model() throws ApiException, IOException {
-            return execute(get("/ping.html").build(), Model.class);
+            return execute(get("/ping.html").build(), new TypeReference<Model>() {
+            });
         }
 
         public Model model(ModelParams params) throws ApiException, IOException {

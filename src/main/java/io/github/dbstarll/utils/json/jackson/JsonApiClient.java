@@ -1,6 +1,7 @@
 package io.github.dbstarll.utils.json.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +41,11 @@ public abstract class JsonApiClient extends ApiClient {
         return convertResult;
     }
 
+    protected final <T> T execute(final ClassicHttpRequest request, final TypeReference<T> typeReference)
+            throws IOException, ApiException {
+        return execute(request, mapper.constructType(typeReference));
+    }
+
     @Override
     protected final <T> T execute(final ClassicHttpRequest request, final Class<T> responseClass)
             throws IOException, ApiException {
@@ -48,7 +54,7 @@ public abstract class JsonApiClient extends ApiClient {
         if (responseHandler != null) {
             return execute(request, responseHandler);
         } else {
-            return execute(request, mapper.getTypeFactory().constructType(responseClass));
+            return execute(request, mapper.constructType(responseClass));
         }
     }
 
