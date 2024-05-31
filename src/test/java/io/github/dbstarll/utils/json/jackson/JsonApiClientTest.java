@@ -161,10 +161,12 @@ class JsonApiClientTest extends JsonApiClientTestCase {
         }
     }
 
-    private static class ModelParams implements Serializable {
+    static class ModelParams implements Serializable {
+        private static final long serialVersionUID = -9077659385097066754L;
+
         private final String name;
 
-        private ModelParams(String name) {
+        ModelParams(String name) {
             this.name = name;
         }
 

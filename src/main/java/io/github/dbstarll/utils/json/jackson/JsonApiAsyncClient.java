@@ -1,5 +1,6 @@
 package io.github.dbstarll.utils.json.jackson;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dbstarll.utils.net.api.ApiAsyncClient;
@@ -7,8 +8,11 @@ import io.github.dbstarll.utils.net.api.StreamFutureCallback;
 import io.github.dbstarll.utils.net.api.index.EventStreamIndex;
 import io.github.dbstarll.utils.net.api.index.Index;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
+import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
@@ -28,6 +32,11 @@ public abstract class JsonApiAsyncClient extends ApiAsyncClient {
         this.mapper = mapper;
         setResponseHandlerFactory(new JsonResponseHandlerFactory(mapper, alwaysProcessEntity));
         setResponseHandlerFactory(new JsonIndexResponseHandlerFactory(getResponseHandler(String.class), mapper));
+    }
+
+    protected final <T> HttpEntity jsonEntity(final T request) throws JsonProcessingException {
+        return EntityBuilder.create().setText(mapper.writeValueAsString(request))
+                .setContentType(ContentType.APPLICATION_JSON).setContentEncoding("UTF-8").build();
     }
 
     private <H, C> BiConsumer<H, C> convert(final ClassicHttpRequest request, final JavaType javaType) {

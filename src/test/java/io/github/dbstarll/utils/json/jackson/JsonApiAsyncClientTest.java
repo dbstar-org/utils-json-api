@@ -9,6 +9,7 @@ import io.github.dbstarll.utils.http.client.request.RelativeUriResolver;
 import io.github.dbstarll.utils.json.JsonApiClientTestCase;
 import io.github.dbstarll.utils.json.JsonParseException;
 import io.github.dbstarll.utils.json.ThrowingBiConsumer;
+import io.github.dbstarll.utils.json.jackson.JsonApiClientTest.ModelParams;
 import io.github.dbstarll.utils.json.test.Model;
 import io.github.dbstarll.utils.net.api.ApiException;
 import io.github.dbstarll.utils.net.api.StreamFutureCallback;
@@ -32,14 +33,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JsonApiAsyncClientTest extends JsonApiClientTestCase {
     private ObjectMapper mapper;
@@ -98,6 +92,21 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertEquals(3.14, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
         }, s -> s.enqueue(new MockResponse().setBody(jsonObject)));
+    }
+
+    @Test
+    void modelEntity() throws Throwable {
+        useApi((s, c) -> {
+            final MyFutureCallback<Model> callback = new MyFutureCallback<>();
+            final Model model = c.model(new ModelParams("name"), callback).get();
+            callback.assertResult(model);
+            assertNotNull(model);
+            assertEquals(100, model.getIntValue());
+            assertEquals("中文", model.getStringValue());
+            assertTrue(model.isBooleanValue());
+            assertEquals(3.14, model.getFloatValue(), 0.0001);
+            assertArrayEquals(new int[]{1, 2, 3, 4, 5}, model.getIntArray());
+        }, s -> s.enqueue(new MockResponse().setBody(jsonObject).setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
     }
 
     @Test
@@ -234,7 +243,6 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         useApi((s, c) -> {
             final MyIgnoreEventStreamFutureCallback<JsonNode> callback = new MyIgnoreEventStreamFutureCallback<>();
             final ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> c.event(callback).get());
-            e.printStackTrace();
             assertNotNull(e.getCause());
             assertSame(UnsupportedEncodingException.class, e.getCause().getClass());
             assertEquals("UTF-88", e.getCause().getMessage());
@@ -270,6 +278,10 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
 
         public Future<Model> model(final FutureCallback<Model> callback) throws ApiException, IOException {
             return execute(get("/ping.html").build(), Model.class, callback);
+        }
+
+        public Future<Model> model(final ModelParams params, final FutureCallback<Model> callback) throws ApiException, IOException {
+            return execute(post("/ping.html").setEntity(jsonEntity(params)).build(), Model.class, callback);
         }
 
         public Future<ArrayNode> array(final FutureCallback<ArrayNode> callback) throws ApiException, IOException {

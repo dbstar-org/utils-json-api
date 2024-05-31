@@ -14,9 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JsonResponseHandlerTest extends JsonApiClientTestCase {
     private JsonParser<String> stringParser;
@@ -52,11 +50,12 @@ class JsonResponseHandlerTest extends JsonApiClientTestCase {
     }
 
     @Test
-    void errorNoEntity() {
+    void errorNoEntity() throws IOException {
         final HttpClientResponseHandler<String> responseHandler = JsonResponseHandler.create(stringParser, false);
-        final ClassicHttpResponse response = ClassicResponseBuilder.create(404).build();
-        final Exception e = assertThrowsExactly(HttpResponseException.class, () -> responseHandler.handleResponse(response));
-        assertEquals("status code: 404, reason phrase: Not Found", e.getMessage());
+        try (final ClassicHttpResponse response = ClassicResponseBuilder.create(404).build()) {
+            final Exception e = assertThrowsExactly(HttpResponseException.class, () -> responseHandler.handleResponse(response));
+            assertEquals("status code: 404, reason phrase: Not Found", e.getMessage());
+        }
     }
 
     @Test
