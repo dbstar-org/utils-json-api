@@ -160,7 +160,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertFalse(model.isBooleanValue());
             assertEquals(1.41, model.getFloatValue(), 0.0001);
             assertArrayEquals(new int[]{5, 4, 3, 2, 1}, model.getIntArray());
-        }, s -> s.enqueue(new MockResponse().setBody(jsonObject + "\n" + mapper.writeValueAsString(model2))));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .setBody(jsonObject + "\n" + mapper.writeValueAsString(model2))));
     }
 
     @Test
@@ -169,7 +171,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             final MyStreamFutureCallback<Model> callback = new MyStreamFutureCallback<>();
             assertNull(c.streamModel(callback).get());
             assertEquals(0, callback.results.size());
-        }, s -> s.enqueue(new MockResponse().setBody(" \n ")));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .setBody(" \n ")));
     }
 
     @Test
@@ -178,7 +182,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             final MyStreamFutureCallback<JsonNode> callback = new MyStreamFutureCallback<>();
             assertNull(c.stream(callback).get());
             assertEquals(0, callback.results.size());
-        }, s -> s.enqueue(new MockResponse().setBody(" \n ")));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .setBody(" \n ")));
     }
 
     @Test
@@ -190,7 +196,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertSame(JsonParseException.class, e.getCause().getClass());
             assertNotNull(e.getCause().getCause());
             assertSame(JsonEOFException.class, e.getCause().getCause().getClass());
-        }, s -> s.enqueue(new MockResponse().setBody("{")));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .setBody("{")));
     }
 
     @Test
@@ -200,7 +208,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertNull(c.stream(callback).get());
             assertEquals(1, callback.results.size());
             assertEquals("{}", callback.results.get(0).toString());
-        }, s -> s.enqueue(new MockResponse().setBody("{}")));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .setBody("{}")));
     }
 
     @Test
@@ -212,7 +222,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertSame(JsonParseException.class, e.getCause().getClass());
             assertNotNull(e.getCause().getCause());
             assertSame(JsonEOFException.class, e.getCause().getCause().getClass());
-        }, s -> s.enqueue(new MockResponse().setBody("{")));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .setBody("{")));
     }
 
     @Test
@@ -223,20 +235,9 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
             assertEquals(2, callback.results.size());
             assertEquals("{}", callback.results.get(0).toString());
             assertEquals("[]", callback.results.get(1).toString());
-        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\ndata: ignore\n\n  \n\n")));
-    }
-
-    @Test
-    void streamEventBlankContentType() throws Throwable {
-        useApi((s, c) -> {
-            final MyIgnoreEventStreamFutureCallback<JsonNode> callback = new MyIgnoreEventStreamFutureCallback<>();
-            assertNull(c.event(callback).get());
-            assertEquals(2, callback.results.size());
-            assertEquals("{}", callback.results.get(0).toString());
-            assertEquals("[]", callback.results.get(1).toString());
-            //text/event-stream; charset=UTF-8
-        }, s -> s.enqueue(new MockResponse().setBody("data: {}\n\ndata: []\n\ndata:  \n\ndata: ignore\n\n  \n\n")
-                .setHeader(HttpHeaders.CONTENT_TYPE, "  ")));
+        }, s -> s.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_EVENT_STREAM)
+                .setBody("data: {}\n\ndata: []\n\ndata:  \n\ndata: ignore\n\n  \n\n")));
     }
 
     @Test

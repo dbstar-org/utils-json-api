@@ -1,15 +1,17 @@
 package io.github.dbstarll.utils.json.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dbstarll.utils.json.JsonParseException;
 import io.github.dbstarll.utils.net.api.index.IndexBaseHttpClientResponseHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
 
-class JsonNodeIndexResponseHandler extends IndexBaseHttpClientResponseHandler<JsonNodeIndex> {
+class JsonNodeIndexResponseHandler extends IndexBaseHttpClientResponseHandler<String, JsonNode, JsonNodeIndex> {
     private final ObjectMapper mapper;
 
     JsonNodeIndexResponseHandler(final HttpClientResponseHandler<String> stringResponseHandler,
@@ -19,7 +21,13 @@ class JsonNodeIndexResponseHandler extends IndexBaseHttpClientResponseHandler<Js
     }
 
     @Override
-    protected JsonNodeIndex handleContent(final String content, final boolean endOfStream) throws IOException {
+    protected boolean supports(final ContentType contentType) {
+        return ContentType.APPLICATION_JSON.isSameMimeType(contentType);
+    }
+
+    @Override
+    protected JsonNodeIndex handleContent(final ContentType contentType, final String content,
+                                          final boolean endOfStream) throws IOException {
         if (StringUtils.isBlank(content)) {
             return new JsonNodeIndex(null, -1);
         }

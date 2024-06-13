@@ -8,12 +8,13 @@ import io.github.dbstarll.utils.net.api.index.AbstractIndex;
 import io.github.dbstarll.utils.net.api.index.Index;
 import io.github.dbstarll.utils.net.api.index.IndexBaseHttpClientResponseHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
 
-final class StreamJavaTypeResponseHandler<T> extends IndexBaseHttpClientResponseHandler<Index<T>> {
+final class StreamJavaTypeResponseHandler<T> extends IndexBaseHttpClientResponseHandler<String, T, Index<T>> {
     private final ObjectMapper mapper;
     private final JavaType javaType;
     private final BiConsumer<String, T> consumer;
@@ -28,7 +29,13 @@ final class StreamJavaTypeResponseHandler<T> extends IndexBaseHttpClientResponse
     }
 
     @Override
-    protected Index<T> handleContent(final String content, final boolean endOfStream) throws IOException {
+    protected boolean supports(final ContentType contentType) {
+        return ContentType.APPLICATION_JSON.isSameMimeType(contentType);
+    }
+
+    @Override
+    protected Index<T> handleContent(final ContentType contentType, final String content, final boolean endOfStream)
+            throws IOException {
         if (StringUtils.isBlank(content)) {
             return new AbstractIndex<T>(null, -1) {
             };
