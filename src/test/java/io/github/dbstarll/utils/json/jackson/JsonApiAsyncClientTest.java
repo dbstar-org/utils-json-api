@@ -20,6 +20,7 @@ import org.apache.hc.client5.http.async.HttpAsyncClient;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -373,7 +374,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         protected final List<T> results = new ArrayList<>();
 
         @Override
-        public void stream(T result) {
+        public void stream(HttpResponse response, ContentType contentType, boolean endOfStream, T result) {
             results.add(result);
         }
     }
