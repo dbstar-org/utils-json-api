@@ -21,11 +21,6 @@ class JsonNodeIndexResponseHandler extends IndexBaseHttpClientResponseHandler<St
     }
 
     @Override
-    protected boolean supports(final ContentType contentType) {
-        return ContentType.APPLICATION_JSON.isSameMimeType(contentType);
-    }
-
-    @Override
     protected JsonNodeIndex handleContent(final ContentType contentType, final String content,
                                           final boolean endOfStream) throws IOException {
         if (StringUtils.isBlank(content)) {
