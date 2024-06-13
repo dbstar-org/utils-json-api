@@ -374,7 +374,7 @@ class JsonApiAsyncClientTest extends JsonApiClientTestCase {
         protected final List<T> results = new ArrayList<>();
 
         @Override
-        public void stream(ContentType contentType, boolean endOfStream, T result) {
+        public void stream(ContentType contentType, T result) {
             results.add(result);
         }
     }
